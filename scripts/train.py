@@ -14,7 +14,7 @@ from torch.utils.data import TensorDataset, DataLoader
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
-# --- 2. 加载数据 (和以前一样) ---
+# --- 2. 加载数据  ---
 with open('data/tv_sim_split_train.pkl', 'rb') as f:
     X_train = pickle.load(f)
 with open('data/tv_sim_split_valid.pkl', 'rb') as f:
@@ -39,8 +39,7 @@ for i in tqdm(range(np.shape(X_valid)[0])):
     pad_seq = seq.ljust(70,'0')
     X_ohe_valid_list.append(one_hot_encode(pad_seq))
     
-# --- 3. 关键优化：将数据列表一次性转换为张量 ---
-# 这是解决 UserWarning 的核心
+# --- 3. 将数据列表一次性转换为张量 ---
 print("Converting training list to single tensor...")
 # 首先转换为一个大的 numpy 数组，然后转换为 Pytorch 张量，并立刻展平
 X_ohe_train_tensor = torch.FloatTensor(np.array(X_ohe_train_list)).view(-1, 1540)
@@ -51,7 +50,7 @@ X_ohe_valid_tensor = torch.FloatTensor(np.array(X_ohe_valid_list)).view(-1, 1540
 print(f"Train tensor shape: {X_ohe_train_tensor.shape}")
 print(f"Valid tensor shape: {X_ohe_valid_tensor.shape}")
 
-# --- 4. 定义模型 (和以前一样) ---
+# --- 4. 定义模型  ---
 class VAE(nn.Module):
     def __init__(self):
         super(VAE, self).__init__()
