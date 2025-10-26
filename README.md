@@ -176,16 +176,14 @@ python scripts/sample.py
     1. **低通过率**: `214 / 826` 条序列通过了筛选 (通过率 **26%**)。
         
     2. **区域坍塌**: UMAP 可视化图 (`clustering_amts_to_test_with_generated.jpg`) 显示，通过筛选的 214 条序列**几乎全部**（标记为橙色 'x'）聚集在 4 个簇中的第 2 簇 (Rhoto) 附近。
-![[Pasted image 20251026175227.png]]
-
-        
+![alt text](clustering_amts_to_test_with_generated-2.jpg)
 - **原始论文 (VAE) 结果**:
     
     1. **高通过率**: 论文在图 4a 中展示了在 4 种生物体上的高成功率 (50% - 100%)。
         
     2. **广谱生成**: 论文的 VAE 成功生成了能被所有 4 个簇接受的序列。
         
-![[clustering_amts_to_test.png]]
+![alt text](clustering_amts_to_test.png)
 
 ### 3. 模型架构差异是结果差异的核心
 
