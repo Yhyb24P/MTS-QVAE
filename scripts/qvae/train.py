@@ -9,35 +9,47 @@ from torch.nn import functional as F
 import torch
 from torch.utils.data import TensorDataset, DataLoader
 
+import sys
+import os
+# 获取当前脚本 (train.py) 的目录
+# e.g., /home/yhshy/git_files/MTS-QBM-VAE/scripts/qvae
+current_script_dir = os.path.dirname(os.path.abspath(__file__))
+# 计算项目的根目录 (向上两级)
+# e.g., /home/yhshy/git_files/MTS-QBM-VAE
+project_root = os.path.abspath(os.path.join(current_script_dir, '..', '..'))
+# 将项目根目录添加到 Python 搜索路径
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+    print(f"已将 {project_root} 添加到 sys.path")
+
+
+import kaiwu as kw
+kw.license.init(user_id="105879747841515522", sdk_code="4vCbDDWqIdUEXDdEHKK0L4MtOOXvMF")
+
 # --- TODO: 导入 QVAE 相关的库 ---
-# 请根据您的库名称修改 "kaiwu_torch_plugin"
-# 这些导入是基于 "MTS-QBM-VAE工作流.md" 的分析
 try:
-    from kaiwu_torch_plugin import QVAE, RestrictedBoltzmannMachine
-    from kaiwu_torch_plugin.qvae_dist_util import FactorialBernoulliUtil
-    # QVAE 训练需要一个采样器来估计 log Z
-    # 您必须提供一个采样器实现，这里以 SimulatedAnnealingSampler 为例
-    from kaiwu_torch_plugin.samplers import SimulatedAnnealingSampler 
+    #  我们需要 RBM (作为先验) 和 QVAE (主模型)
+    from kaiwu_torch_plugin import QVAE, BoltzmannMachine, RestrictedBoltzmannMachine
+    #  采样器 sampler 在 kaiwu.classical 包中
+    from kaiwu.classical import SimulatedAnnealingOptimizer
 except ImportError:
     print("="*50)
-    print("错误：无法导入 QVAE 库 (kaiwu_torch_plugin)。")
-    print("请确保已安装该库，或已将 'kaiwu_torch_plugin' 替换为正确的包名。")
-    print("您还需要一个采样器实现 (例如 SimulatedAnnealingSampler)。")
+    print(f"错误：无法导入 QVAE 库 (kaiwu_torch_plugin)。")
+    print(f"已将 {project_root} 添加到 sys.path，请检查该目录下是否存在 'kaiwu_torch_plugin' 文件夹。")
     print("="*50)
-    # 抛出异常以停止执行，因为后续代码无法运行
     raise
 
 # --- 1. 设置与常量 ---
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Using device: {device}")
+print(f"使用设备: {device}")
 
-# 统一定义维度
+
 INPUT_DIM = 1540  # 70 * 22
-LATENT_DIM = 32   # 保持与您原 VAE 一致的 32 维隐空间
+LATENT_DIM = 32   # 保持与原 VAE 一致的 32 维隐空间
 BATCH_SIZE = 128
 EPOCHS = 35
 
-# --- 2. 加载数据 (与原脚本相同) ---
+# --- 2. 加载数据  ---
 with open('qdata/tv_sim_split_train.pkl', 'rb') as f:
     X_train = pickle.load(f)
 with open('qdata/tv_sim_split_valid.pkl', 'rb') as f:
@@ -64,6 +76,8 @@ for i in tqdm(range(np.shape(X_valid)[0])):
     
 print("Converting training list to single tensor...")
 X_ohe_train_tensor = torch.FloatTensor(np.array(X_ohe_train_list)).view(-1, INPUT_DIM)
+mean_x = X_ohe_train_tensor.mean().item()
+print(f"Calculated train_bias (mean_x): {mean_x}")
 
 print("Converting validation list to single tensor...")
 X_ohe_valid_tensor = torch.FloatTensor(np.array(X_ohe_valid_list)).view(-1, INPUT_DIM)
@@ -72,15 +86,11 @@ print(f"Train tensor shape: {X_ohe_train_tensor.shape}")
 print(f"Valid tensor shape: {X_ohe_valid_tensor.shape}")
 
 # --- 3. 定义 QVAE 的组件 (编码器和解码器) ---
-# 根据 "MTS-QBM-VAE工作流.md"，我们将原 VAE 拆分为 Encoder 和 Decoder
-
 class Encoder(nn.Module):
     """编码器： p(x) -> q_logits (用于 q(z|x))"""
     def __init__(self, input_dim, latent_dim):
         super(Encoder, self).__init__()
         self.fc1 = nn.Linear(input_dim, 512)
-        # 不再需要 fc21(mu) 和 fc22(logvar)
-        # 而是输出离散后验的 logits
         self.fc_logits = nn.Linear(512, latent_dim)
         self.relu = nn.ReLU()
 
@@ -97,12 +107,10 @@ class Decoder(nn.Module):
         self.relu = nn.ReLU()
 
     def forward(self, z):
-        # QVAE 的 z 是二元 (0/1) 的，需要转为 float
         h3 = self.relu(self.fc3(z.float()))
-        # 输出 logits，损失函数将处理 sigmoid
         return self.fc4(h3)
 
-# --- 4. 设置 DataLoader (与原脚本相同) ---
+# --- 4. 设置 DataLoader  ---
 train_dataset = TensorDataset(X_ohe_train_tensor)
 valid_dataset = TensorDataset(X_ohe_valid_tensor)
 
@@ -123,85 +131,102 @@ valid_loader = DataLoader(
 
 # --- 5. 实例化 QVAE 模型、采样器和优化器 ---
 
-# 1. 实例化编码器和解码器
 encoder = Encoder(INPUT_DIM, LATENT_DIM).to(device)
 decoder = Decoder(LATENT_DIM, INPUT_DIM).to(device)
 
-# 2. 实例化玻尔兹曼机先验 (RBM)
-# RBM 的可见层 (n_visible) 必须等于您的隐空间维度 (LATENT_DIM)
-rbm_prior = RestrictedBoltzmannMachine(
-    n_visible=LATENT_DIM, 
-    n_hidden=64  # 这是一个超参数，您可以调整
+prior_vis = LATENT_DIM // 2
+prior_hid = LATENT_DIM - prior_vis
+bm_prior = RestrictedBoltzmannMachine(
+    num_visible=prior_vis, # 16
+    num_hidden=prior_hid   # 16
 ).to(device)
+print(f"已初始化 RestrictedBoltzmannMachine 先验，总共 {bm_prior.num_nodes} 个节点 ({bm_prior.num_visible} 可见 + {bm_prior.num_hidden} 隐藏)。")
 
-# 3. 实例化采样器 (TODO: 必须提供)
-# "工作流" 指出需要采样器来估计 log Z
-# 您需要配置您的采样器，例如：
-sampler = SimulatedAnnealingSampler(n_steps=100) 
+sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100) 
 
-# 4. 实例化 QVAE 主模型
 model = QVAE(
     encoder=encoder,
     decoder=decoder,
-    bm=rbm_prior,
-    recon_dist_util=FactorialBernoulliUtil, # 使用文档中提到的工具
-    sampler=sampler
+    bm=bm_prior,
+    sampler=sampler,
+    dist_beta=1.0,
+    mean_x=mean_x,
+    num_vis=bm_prior.num_visible
 ).to(device)
 
-# 5. 实例化优化器
-# 优化器将自动管理 QVAE 内部所有参数 (encoder, decoder, bm)
 optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
-# --- 6. 训练与验证循环 (已修改为 QVAE) ---
+# --- 6. 训练与验证循环  ---
 f = open("qdata/loss_qvae_w1.txt", "a")
-
-# 删除旧的 loss_function
-# def loss_function(recon_x, x, mu, logvar): ... (已删除)
 
 for epoch in range(EPOCHS):
     # --- 训练 ---
-    model.train() # 设置为训练模式
-    train_loss = 0
+    model.train()
+    #  初始化所有损失跟踪器
+    train_loss_total = 0.0 # 总损失 (ELBO + WD)
+    train_loss_elbo = 0.0  # 仅 ELBO (KL + 重建)
+    train_loss_wd = 0.0    # 仅 权重衰减
     
     for (batch_X,) in tqdm(train_loader, desc=f"Epoch {epoch+1}/{EPOCHS} [Train]"):
         
         batch_X = batch_X.to(device)
         optimizer.zero_grad()
         
-        # --- 核心改动：使用 QVAE 的 neg_elbo 作为损失 ---
-        # "工作流" 指出 QVAE 的训练是端到端的，通过 neg_elbo 计算
-        # kl_beta 是 KL 散度的权重，可以用于退火 (从 0 缓慢增加到 1)
-        # 这里为简单起见，我们直接设为 1.0
-        kl_beta = 1.0 
-        loss = model.neg_elbo(batch_X, kl_beta=kl_beta)
-        # --- 结束改动 ---
+        (output, recon_x, neg_elbo, wd_loss, 
+         total_kl, cost, q, zeta) = model.neg_elbo(batch_X, kl_beta=1.0)
+        
+        #  loss 是 ELBO 和 权重衰减 的总和
+        loss = neg_elbo + wd_loss 
         
         loss.backward()
-        train_loss += loss.item()
+
+        #  累加所有损失
+        train_loss_total += loss.item()
+        train_loss_elbo += neg_elbo.item()
+        train_loss_wd += wd_loss.item()
+
         optimizer.step()
     
-    avg_train_loss = train_loss / len(train_loader.dataset)
-    f.write(f"Epoch: {epoch}. Train Loss: {avg_train_loss}\n")
-    print(f"Epoch: {epoch}. Train Loss: {avg_train_loss}")
+    #  计算并打印所有平均损失
+    avg_train_total = train_loss_total / len(train_loader)
+    avg_train_elbo = train_loss_elbo / len(train_loader)
+    avg_train_wd = train_loss_wd / len(train_loader)
     
-    # 保存模型 (使用新名称)
+    log_msg_train = f"Epoch: {epoch}. Train Loss: {avg_train_total:.4f} (ELBO: {avg_train_elbo:.4f}, WD: {avg_train_wd:.4f})"
+    f.write(log_msg_train + "\n")
+    print(log_msg_train)
+    
     torch.save(model.state_dict(), f"model/qvae_mts_kl_weight_1_batch_size_{BATCH_SIZE}_epochs{epoch}.chkpt")
 
     # --- 验证 ---
-    model.eval() # 设置为评估模式
+    model.eval()
     with torch.no_grad():
-        valid_loss = 0
+        #  初始化所有损失跟踪器
+        valid_loss_total = 0.0
+        valid_loss_elbo = 0.0
+        valid_loss_wd = 0.0
+
         for (batchv_X,) in tqdm(valid_loader, desc=f"Epoch {epoch+1}/{EPOCHS} [Valid]"):
             
             batchv_X = batchv_X.to(device)
             
-            # 验证时也使用 neg_elbo
-            loss = model.neg_elbo(batchv_X, kl_beta=1.0)
-            valid_loss += loss.item()
+            (v_output, v_recon_x, v_neg_elbo, v_wd_loss, 
+             v_total_kl, v_cost, v_q, v_zeta) = model.neg_elbo(batchv_X, kl_beta=1.0)
+            
+            #  累加所有损失
+            valid_loss_total += (v_neg_elbo + v_wd_loss).item()
+            valid_loss_elbo += v_neg_elbo.item()
+            valid_loss_wd += v_wd_loss.item()
     
-        avg_valid_loss = valid_loss / len(valid_loader.dataset)
-        f.write(f"Epoch: {epoch}. Valid Loss: {avg_valid_loss}\n")
-        print(f"Epoch: {epoch}. Valid Loss: {avg_valid_loss}")
+        #  计算并打印所有平均损失
+        avg_valid_total = valid_loss_total / len(valid_loader)
+        avg_valid_elbo = valid_loss_elbo / len(valid_loader)
+        avg_valid_wd = valid_loss_wd / len(valid_loader)
+
+        log_msg_valid = f"Epoch: {epoch}. Valid Loss: {avg_valid_total:.4f} (ELBO: {avg_valid_elbo:.4f}, WD: {avg_valid_wd:.4f})"
+        f.write(log_msg_valid + "\n")
+        print(log_msg_valid)
 
 f.close()
 print("QVAE 训练和评估结束")
+

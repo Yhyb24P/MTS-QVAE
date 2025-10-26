@@ -9,22 +9,34 @@ import torch.nn as nn
 from torch.nn import functional as F
 import torch
 
+import sys
+import os
+# 获取当前脚本 (generate.py) 的目录
+current_script_dir = os.path.dirname(os.path.abspath(__file__))
+# 计算项目的根目录 (向上两级)
+project_root = os.path.abspath(os.path.join(current_script_dir, '..', '..'))
+# 将项目根目录添加到 Python 搜索路径
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+    print(f"已将 {project_root} 添加到 sys.path")
+
+import kaiwu as kw
+kw.license.init(user_id="105879747841515522", sdk_code="4vCbDDWqIdUEXDdEHKK0L4MtOOXvMF")
+
+
 # --- TODO: 导入 QVAE 相关的库 ---
-# 导入的类必须与 train.py 中的定义完全一致
 try:
-    from kaiwu_torch_plugin import QVAE, RestrictedBoltzmannMachine
-    from kaiwu_torch_plugin.qvae_dist_util import FactorialBernoulliUtil
-    from kaiwu_torch_plugin.samplers import SimulatedAnnealingSampler 
+    #  导入与 train_fixed.py 完全相同的类
+    from kaiwu_torch_plugin import QVAE, BoltzmannMachine, RestrictedBoltzmannMachine
+    from kaiwu.classical import SimulatedAnnealingOptimizer
 except ImportError:
     print("="*50)
-    print("错误：无法导入 QVAE 库 (kaiwu_torch_plugin)。")
-    print("请确保导入的类与 train.py 中定义的一致。")
+    print(f"错误：无法导入 QVAE 库 (kaiwu_torch_plugin)。")
+    print(f"已将 {project_root} 添加到 sys.path，请检查该目录下是否存在 'kaiwu_torch_plugin' 文件夹。")
     print("="*50)
     raise
 
-# --- 1. 定义 QVAE 组件 (必须与 train.py 一致) ---
-# 为了加载模型，我们必须先创建完全相同的架构实例
-
+# --- 1. 定义 QVAE 组件 ---
 INPUT_DIM = 1540  # 70 * 22
 LATENT_DIM = 32   # 32 维隐空间
 
@@ -50,7 +62,7 @@ class Decoder(nn.Module):
         h3 = self.relu(self.fc3(z.float()))
         return self.fc4(h3)
 
-# 辅助函数 (来自原 generate.py)
+# 辅助函数 
 def write_fasta(name, sequence_df):
     out_file = open(name + '.fasta', "w")
     for i in range(len(sequence_df)):
@@ -61,71 +73,83 @@ def write_fasta(name, sequence_df):
 # --- 2. 实例化模型并加载权重 ---
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"使用设备: {device}")
 
 # 1. 实例化所有组件
-encoder = Encoder(INPUT_DIM, LATENT_DIM)
-decoder = Decoder(LATENT_DIM, INPUT_DIM)
-rbm_prior = RestrictedBoltzmannMachine(n_visible=LATENT_DIM, n_hidden=64) # 必须与训练时相同
+encoder = Encoder(INPUT_DIM, LATENT_DIM).to(device)
+decoder = Decoder(LATENT_DIM, INPUT_DIM).to(device)
 
-# 2. 实例化采样器 (TODO: 必须提供)
-# 这里我们需要采样器来从先验 p(z) 中采样
-sampler = SimulatedAnnealingSampler(n_steps=100) # 确保配置与训练时兼容
+# 2.  实例化玻尔兹曼机先验 (RBM)
+# 必须与 train.py 完全一致
+prior_vis = LATENT_DIM // 2
+prior_hid = LATENT_DIM - prior_vis
+bm_prior = RestrictedBoltzmannMachine(
+    num_visible=prior_vis, # 16
+    num_hidden=prior_hid   # 16
+).to(device)
+print(f"已初始化 RestrictedBoltzmannMachine 先验，总共 {bm_prior.num_nodes} 个节点 ({bm_prior.num_visible} 可见 + {bm_prior.num_hidden} 隐藏)。")
 
-# 3. 实例化 QVAE 主模型
+
+# 3. 实例化采样器
+sampler = SimulatedAnnealingOptimizer(alpha=0.99)
+
+# 4. 实例化 QVAE 主模型
+#  必须使用与训练时完全相同的参数实例化
+# 否则 load_state_dict 会失败
 model = QVAE(
     encoder=encoder,
     decoder=decoder,
-    bm=rbm_prior,
-    recon_dist_util=FactorialBernoulliUtil,
-    sampler=sampler
+    bm=bm_prior,
+    sampler=sampler,
+    dist_beta=1.0,           #  必须与训练时一致
+    mean_x=0.04545454680919647, #  必须与训练时一致 
+    num_vis=bm_prior.num_visible #  必须与训练时一致 (16)
 ).to(device)
 
-# 4. 加载训练好的权重
-# TODO: 确保这里的路径和 epoch 与您最终训练好的模型一致
+# 5. 加载训练好的权重
+# [TODO] 确保这个路径是您最终训练好的模型
 model_path = "model/qvae_mts_kl_weight_1_batch_size_128_epochs26.chkpt"
-print(f"Loading model from: {model_path}")
+print(f"从以下路径加载模型: {model_path}")
 model.load_state_dict(torch.load(model_path, map_location=device))
 model.eval() # 设置为评估模式
 
-# 字典 (与原脚本相同)
+# 字典
 cdict = dict(zip("FIWLVMYCATHGSQRKNEPD$0", range(22)))  
 rev_dict = {j:i for i,j in cdict.items()}
 
 N_SAMPLES_TO_GENERATE = 1000
 
-# --- 3. 核心改动：从 QVAE 的玻尔兹曼机先验 p(z) 采样 ---
+# --- 3.从 QVAE 的玻尔兹曼机先验 p(z) 采样 ---
 
-print(f"Sampling {N_SAMPLES_TO_GENERATE} sequences from QVAE prior (RBM)...")
+print(f"从 QVAE 先验 (RBM) 采样 {N_SAMPLES_TO_GENERATE} 个序列...")
 with torch.no_grad():
     
-    # 旧代码：sample = torch.randn(1000, 32) (已删除)
-
-    # 新代码：
     # 1. 获取训练好的玻尔兹曼机 (先验)
     trained_prior = model.bm.to(device) 
     
-    # 2. 使用采样器从先验中采样
-    # 这将运行一个采样算法 (例如模拟退火) 来获取 p(z) 的样本
-    # (这可能比 torch.randn 慢得多)
-    z_samples = trained_prior.sample(sampler, n_samples=N_SAMPLES_TO_GENERATE)
-    z_samples = z_samples.to(device) # 确保样本在 GPU 上以便解码
+    # 2. 配置采样器以生成 N_SAMPLES_TO_GENERATE 个样本
+    sampler.size_limit = N_SAMPLES_TO_GENERATE
     
-    # 3. 使用解码器解码离散样本
+    # 3. 调用正确的 sample() 接口
+    print("运行采样器以从先验获取 z_samples... (这可能需要一些时间)")
+    z_samples = trained_prior.sample(sampler) # 返回 (N_SAMPLES, 32)
+    z_samples = z_samples.to(device)
+    print(f"已生成 {z_samples.shape[0]} 个隐样本。")
+    
+    # 4. 使用解码器解码离散样本
     sample_logits = model.decoder(z_samples)
     
-    # 4. 将 logits 转换为概率 (Sigmoid) 并移回 CPU
-    # (原 VAE 也使用了 sigmoid)
+    # 5. 将 logits 转换为概率 (Sigmoid) 并移回 CPU
     sample_probs = torch.sigmoid(sample_logits).cpu()
     sample_probs = sample_probs.view(N_SAMPLES_TO_GENERATE, 70, 22)
 
-# --- 4. 后处理 (与原脚本相同) ---
+# --- 4. 后处理 ---
 
-print("Decoding sequences...")
+print("解码序列中...")
 sampled_seqs = []
 for i, seq_probs in enumerate(sample_probs):
     out_seq = []
     for j, pos_probs in enumerate(seq_probs):
-        # 从概率中选择最可能的氨基酸
         best_idx = pos_probs.argmax()
         out_seq.append(rev_dict[best_idx.item()])
         
@@ -135,21 +159,20 @@ for i, seq_probs in enumerate(sample_probs):
 seq_to_check = []
 count = 0
 for i in range(np.shape(sampled_seqs)[0]):
-    # 过滤掉仍然包含 $ 或 0 的序列
     if sampled_seqs[i].find('$') == - 1 and sampled_seqs[i].find('0') == - 1:
         count = count + 1
         seq_to_check.append(['qvae_sample_'+str(count), sampled_seqs[i]])
 
-print(f"Total valid sequences generated: {len(seq_to_check)}")
+print(f"总共生成的有效序列: {len(seq_to_check)}")
 filtered_seq_to_check = pd.DataFrame(seq_to_check, columns = ['name', 'sequence'])
     
-print('Total number of sequences:', len(filtered_seq_to_check))
+print('序列总数:', len(filtered_seq_to_check))
 filtered_seq_to_check = filtered_seq_to_check.drop_duplicates(subset='sequence').reset_index().drop('index', axis=1)
-print('Total sequences remaining after duplicate removal', len(filtered_seq_to_check))
+print('去重后剩余序列总数', len(filtered_seq_to_check))
 
-# 写入新的 FASTA 文件
 output_fasta_name = 'qdata/amts_qvae_generated'
-print(f"Writing final sequences to {output_fasta_name}.fasta")
+print(f"正在将最终序列写入 {output_fasta_name}.fasta")
 write_fasta(output_fasta_name, filtered_seq_to_check)
 
-print("Generation complete.")
+print("生成完毕。")
+
