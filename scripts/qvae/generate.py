@@ -91,7 +91,9 @@ print(f"已初始化 RestrictedBoltzmannMachine 先验，总共 {bm_prior.num_no
 
 
 # 3. 实例化采样器
-sampler = SimulatedAnnealingOptimizer(alpha=0.99)
+# === 修正 ===
+# 移除了 'num_sweeps=500' 参数，因为它不被接受
+sampler = SimulatedAnnealingOptimizer(alpha=0.999)
 
 # 4. 实例化 QVAE 主模型
 #  此处参数必须与 train.py 中的 QVAE 实例化参数完全一致
@@ -101,13 +103,13 @@ model = QVAE(
     bm=bm_prior,
     sampler=sampler,
     dist_beta=1.0,           
-    mean_x=0.04545454680919647, 
+    mean_x=0.04545454680919647, # 确保这个值与训练 BS=512 时使用的值一致
     num_vis=bm_prior.num_visible 
 ).to(device)
 
 # 5. 加载训练好的权重
-# [TODO] 确保这个路径是您最终训练好的模型
-model_path = "model/qvae_mts_kl_weight_1_batch_size_128_epochs26.chkpt"
+# [正确] 路径已更新为 BS=512 的模型
+model_path = "model/qvae_mts_kl_weight_1_batch_size_512_epochs34.chkpt"
 print(f"从以下路径加载模型: {model_path}")
 model.load_state_dict(torch.load(model_path, map_location=device))
 model.eval() # 设置为评估模式
@@ -127,6 +129,7 @@ with torch.no_grad():
     trained_prior = model.bm.to(device) 
     
     # 2. 配置采样器以生成 N_SAMPLES_TO_GENERATE 个样本
+    # [正确] 这是设置样本量的正确方法
     sampler.size_limit = N_SAMPLES_TO_GENERATE
     
     # 3. 调用正确的 sample() 接口

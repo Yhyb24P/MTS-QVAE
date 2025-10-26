@@ -46,7 +46,7 @@ print(f"使用设备: {device}")
 
 INPUT_DIM = 1540  # 70 * 22
 LATENT_DIM = 32   # 保持与原 VAE 一致的 32 维隐空间
-BATCH_SIZE = 128
+BATCH_SIZE = 512
 EPOCHS = 35
 
 # --- 2. 加载数据  ---
@@ -118,8 +118,9 @@ train_loader = DataLoader(
     train_dataset, 
     batch_size=BATCH_SIZE, 
     shuffle=True, 
-    num_workers=4,
-    pin_memory=True
+    num_workers=8,
+    pin_memory=True,
+    persistent_workers=True
 )
 valid_loader = DataLoader(
     valid_dataset, 

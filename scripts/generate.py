@@ -47,7 +47,7 @@ class VAE(nn.Module):
 
 model = VAE()
 #load a model
-model.load_state_dict(torch.load("model/vae_self_tv_sim_split_kl_weight_1_batch_size_128_epochs26.chkpt"))
+model.load_state_dict(torch.load("MTS/model/vae_self_tv_sim_split_kl_weight_1_batch_size_128_epochs32.chkpt"))
 cdict = dict(zip("FIWLVMYCATHGSQRKNEPD$0", range(22)))  
 rev_dict = {j:i for i,j in cdict.items()}
 
@@ -80,4 +80,4 @@ filtered_seq_to_check = pd.DataFrame(seq_to_check, columns = ['name', 'sequence'
 print('Total number of sequences:', len(filtered_seq_to_check))
 filtered_seq_to_check = filtered_seq_to_check.drop_duplicates(subset='sequence').reset_index().drop('index', axis=1)
 print('Total sequences remaining after duplicate removal', len(filtered_seq_to_check))
-write_fasta('data/amts', filtered_seq_to_check)
+write_fasta('MTS/data/amts', filtered_seq_to_check)

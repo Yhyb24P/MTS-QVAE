@@ -1,18 +1,36 @@
 # Python virtual environment
 qvae/
 unirep/
-qdata/
-ssh-key
-ssh-key.pub
-kaiwu-1.2.0-cp310-none-manylinux1_x86_64.whl
-# Python cache files
+venv/
+env/
+
+# Python cache
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 
-# Environment variables file (contains secrets)
-.env
+# Jupyter Notebook
+.ipynb_checkpoints/
 
-# IDE and editor specific files
+# IDE
 .vscode/
-.idea/qdata/*.npz
+.idea/
+
+# Large data files (这些应交由 Git LFS 管理)
 qdata/*.npz
+qdata/*.pkl
+qdata/*.chkpt
+model/*.chkpt
+
+# Secrets
+.env
+ssh-key
+ssh-key.pub
+
+# Wheel 文件（可选，如果你不想提交）
+kaiwu-1.2.0-cp310-none-manylinux1_x86_64.whl
+
+# 忽略所有数据目录
+qdata/
+data/
