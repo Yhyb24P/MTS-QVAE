@@ -63,6 +63,7 @@ pip install -r requirements_qvae.txt -i [https://pypi.tuna.tsinghua.edu.cn/simpl
 | **损失函数**           | 重建损失 (BCE) + KL 散度 (vs 高斯)    | `model.neg_elbo`                            |
 | **训练逻辑**           | 单一梯度流                         | **双重梯度流** (VAE参数 + RBM先验参数)                 |
 | **采样器**            | 高斯再参数化                        | **`SimulatedAnnealingOptimizer`** (模拟退火)    |
+
 **深度解读：**
 1. **RBM 先验**：我们现在使用 `RestrictedBoltzmannMachine` 来定义先验 $p(z)$。这是一个基于能量的模型，理论上可以学习并表示复杂的多模态分布，更适合描述蛋白质序列的潜空间。
     
