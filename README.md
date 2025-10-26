@@ -26,7 +26,7 @@ python -m pip install -U pip
 pip install -r requirements_qvae.txt -i [https://pypi.tuna.tsinghua.edu.cn/simple](https://pypi.tuna.tsinghua.edu.cn/simple) --extra-index-url [https://download.pytorch.org/whl/cu130](https://download.pytorch.org/whl/cu130)
 ```
 ## 项目文件架构
-根据您提供的结构，关键文件组织如下：
+关键文件组织如下：
 ```
 .
 ├── kaiwu-1.2.0-cp310-none-manylinux1_x86_64.whl  (Kaiwu 核心库)
