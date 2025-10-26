@@ -1,7 +1,10 @@
 # Python virtual environment
 qvae/
 unirep/
-
+qdata/
+ssh-key
+ssh-key.pub
+kaiwu-1.2.0-cp310-none-manylinux1_x86_64.whl
 # Python cache files
 __pycache__/
 *.pyc
@@ -11,4 +14,4 @@ __pycache__/
 
 # IDE and editor specific files
 .vscode/
-.idea/
+.idea/qdata/*.npz
