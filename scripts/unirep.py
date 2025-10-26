@@ -3,7 +3,7 @@ from jax_unirep import get_reps
 from tqdm import tqdm
 import sys
 
-# --- 1. 定义一个简单的 FASTA 读取器 (无需 Biopython) ---
+# --- 1. 定义一个简单的 FASTA 读取器  ---
 def simple_fasta_reader(fasta_file):
     """从 FASTA 文件读取序列并返回一个字典 {name: sequence}"""
     sequences = {}
@@ -26,11 +26,9 @@ def simple_fasta_reader(fasta_file):
         sys.exit(1)
 
 # --- 2. 定义输入和输出文件路径 ---
-# 这是由 generate.py 生成的
-INPUT_FASTA = 'data/amts.fasta' 
+INPUT_FASTA = 'qdata/amts.fasta' 
 
-# 这是我们将要创建的, sample.py 将来会读取这个文件
-OUTPUT_NPZ = 'data/amts.npz' 
+OUTPUT_NPZ = 'qdata/amts.npz' 
 
 # --- 3. 加载序列 ---
 print(f"正在从 {INPUT_FASTA} 加载序列...")
@@ -47,7 +45,6 @@ print(f"已找到 {len(seqs_list)} 条序列。")
 # --- 4. 计算 UniRep 嵌入 ---
 print("正在计算 UniRep 嵌入 (这可能需要几分钟)...")
 # get_reps 返回一个元组 (avg_reps, h_reps)
-# 根据您的测试, 我们需要的是第一个元素 [0]
 avg_embeddings = get_reps(seqs_list)[0] 
 print(f"嵌入计算完成。 Shape: {avg_embeddings.shape}")
 
@@ -67,5 +64,4 @@ print(f"正在将嵌入保存到 {OUTPUT_NPZ}...")
 # **output_data 将字典解包为关键字参数
 np.savez(OUTPUT_NPZ, **output_data) 
 
-print("操作成功完成！")
-print(f"您现在可以切换到 (mtsvae) 环境并修改 'scripts/sample.py'。")
+print("转换完成")

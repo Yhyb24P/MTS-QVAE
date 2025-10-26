@@ -44,7 +44,7 @@ def read_fasta(name):
 
 # --- 1. 加载和处理 "标准" 生物体的 MTS 序列 (Ground Truth) ---
 
-in_fasta = 'data/model_organism_sequences_mts'
+in_fasta = 'qdata/model_organism_sequences_mts'
 seqs_df_total = pd.DataFrame(read_fasta(in_fasta), columns = ['name', 'sequence'])
 
 # 根据序列名称中的关键词为序列分配物种标签
@@ -80,7 +80,7 @@ final_seqs_df['label'].value_counts().plot(ax=ax, kind='bar')
 # --- 2. 加载 "标准" 序列的预计算嵌入 (Embeddings) ---
 
 # 加载 .npz 文件，其中包含序列的预计算嵌入向量 (可能来自 UniRep 或其他模型)
-arrays = np.load('data/model_organism_sequences_mts.npz', allow_pickle=True) 
+arrays = np.load('qdata/model_organism_sequences_mts.npz', allow_pickle=True) 
 
 embd_for_cluster = [] # 用于聚类的嵌入向量
 cluster_data_embd_arranged = [] # 重新排序后的序列信息
@@ -121,14 +121,14 @@ print(cluster_center.shape) # 应为 (4, embedding_dim)
 # --- 4. 加载 "人工" 生成的 MTS 序列 (来自 generate.py) ---
 
 
-in_fasta = 'data/amts' 
+in_fasta = 'qdata/amts' 
 ini_amts_df = pd.DataFrame(read_fasta(in_fasta), columns = ['name', 'sequence'])
 
 # 同样过滤，只保留 'M' 开头的序列
 amts_df = ini_amts_df[ini_amts_df.sequence.str.startswith('M')]
 
 # 加载人工序列的预计算嵌入
-arrays = np.load('data/amts' + '.npz', allow_pickle=True) 
+arrays = np.load('qdata/amts' + '.npz', allow_pickle=True) 
 embd_for_amts = []
 amts_data_embd_arranged = []
 for i in list(arrays.keys()):
@@ -231,7 +231,7 @@ for g in np.unique(cluster_data_embd_arranged_df['label']):
 
 plt.xlabel('UMAP Dimension 1')
 plt.ylabel('UMAP Dimension 2')
-plt.savefig('data/clustering_amts_to_test', dpi=400) # 保存图像
+plt.savefig('qdata/clustering_amts_to_test', dpi=400) # 保存图像
 
 # --- 7. 保存最终筛选和标记的人工序列 ---
 
@@ -250,4 +250,4 @@ for i in range(np.shape(amts_data_embd_arranged_cf)[0]):
 amts_data_embd_arranged_cf['org_label'] = org_label
 
 # 将最终结果保存为 CSV 文件
-amts_data_embd_arranged_cf.to_csv('data/amts_labeled_cluster_final.csv',index=False)
+amts_data_embd_arranged_cf.to_csv('qdata/amts_labeled_cluster_final.csv',index=False)
