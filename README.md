@@ -39,6 +39,7 @@ pip install -r requirements_qvae.txt -i [https://pypi.tuna.tsinghua.edu.cn/simpl
 ```
 
 ## 项目文件架构
+关键文件组织如下：
 
 根据您提供的结构，关键文件组织如下：
 
