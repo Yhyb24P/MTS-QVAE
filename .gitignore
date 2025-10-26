@@ -34,3 +34,4 @@ kaiwu-1.2.0-cp310-none-manylinux1_x86_64.whl
 # 忽略所有数据目录
 qdata/
 data/
+model/
