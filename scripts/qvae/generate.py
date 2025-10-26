@@ -94,16 +94,15 @@ print(f"已初始化 RestrictedBoltzmannMachine 先验，总共 {bm_prior.num_no
 sampler = SimulatedAnnealingOptimizer(alpha=0.99)
 
 # 4. 实例化 QVAE 主模型
-#  必须使用与训练时完全相同的参数实例化
-# 否则 load_state_dict 会失败
+#  此处参数必须与 train.py 中的 QVAE 实例化参数完全一致
 model = QVAE(
     encoder=encoder,
     decoder=decoder,
     bm=bm_prior,
     sampler=sampler,
-    dist_beta=1.0,           #  必须与训练时一致
-    mean_x=0.04545454680919647, #  必须与训练时一致 
-    num_vis=bm_prior.num_visible #  必须与训练时一致 (16)
+    dist_beta=1.0,           
+    mean_x=0.04545454680919647, 
+    num_vis=bm_prior.num_visible 
 ).to(device)
 
 # 5. 加载训练好的权重
@@ -134,15 +133,20 @@ with torch.no_grad():
     print("运行采样器以从先验获取 z_samples... (这可能需要一些时间)")
     z_samples = trained_prior.sample(sampler) # 返回 (N_SAMPLES, 32)
     z_samples = z_samples.to(device)
-    print(f"已生成 {z_samples.shape[0]} 个隐样本。")
+    
+    # === 关键修复：定义实际样本数量 ===
+    actual_samples = z_samples.shape[0] # 使用 z_samples 的实际行数
+    print(f"已生成 {actual_samples} 个隐样本。")
+    # ==================================
     
     # 4. 使用解码器解码离散样本
     sample_logits = model.decoder(z_samples)
     
     # 5. 将 logits 转换为概率 (Sigmoid) 并移回 CPU
     sample_probs = torch.sigmoid(sample_logits).cpu()
-    sample_probs = sample_probs.view(N_SAMPLES_TO_GENERATE, 70, 22)
-
+    
+    # === 修复：使用 actual_samples 替换原来未定义的变量 ===
+    sample_probs = sample_probs.view(actual_samples, 70, 22)        
 # --- 4. 后处理 ---
 
 print("解码序列中...")
@@ -175,4 +179,3 @@ print(f"正在将最终序列写入 {output_fasta_name}.fasta")
 write_fasta(output_fasta_name, filtered_seq_to_check)
 
 print("生成完毕。")
-
