@@ -1,0 +1,1 @@
+Epoch: 0. Train Loss: 145.6855 (ELBO: 145.6805, WD: 0.0050)

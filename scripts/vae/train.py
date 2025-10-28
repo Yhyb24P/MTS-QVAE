@@ -9,10 +9,14 @@ from torch.nn import functional as F
 import torch
 # 导入 DataLoader
 from torch.utils.data import TensorDataset, DataLoader
-
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 # --- 1. 设置设备 ---
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Using device: {device}")
+logging.info(f"Using device: {device}")
 
 # --- 2. 加载数据  ---
 with open('data/tv_sim_split_train.pkl', 'rb') as f:
@@ -25,30 +29,30 @@ def one_hot_encode(seq):
     seq2 = [mapping[i] for i in seq]
     return np.eye(22)[seq2]
 
-print("One-hot encoding training data...")
+logging.info("One-hot encoding training data...")
 X_ohe_train_list = []
 for i in tqdm(range(np.shape(X_train)[0])):
     seq = X_train.sequence[i]+'$'
     pad_seq = seq.ljust(70,'0')
     X_ohe_train_list.append(one_hot_encode(pad_seq))
 
-print("One-hot encoding validation data...")
+logging.info("One-hot encoding validation data...")
 X_ohe_valid_list = []
 for i in tqdm(range(np.shape(X_valid)[0])):
     seq = X_valid.sequence[i]+'$'
     pad_seq = seq.ljust(70,'0')
     X_ohe_valid_list.append(one_hot_encode(pad_seq))
     
-print("Converting training list to single tensor...")
+logging.info("Converting training list to single tensor...")
 
 # 转换为一个大的 numpy 数组，然后转换为 Pytorch 张量，并立刻展平
 X_ohe_train_tensor = torch.FloatTensor(np.array(X_ohe_train_list)).view(-1, 1540)
 
-print("Converting validation list to single tensor...")
+logging.info("Converting validation list to single tensor...")
 X_ohe_valid_tensor = torch.FloatTensor(np.array(X_ohe_valid_list)).view(-1, 1540)
 
-print(f"Train tensor shape: {X_ohe_train_tensor.shape}")
-print(f"Valid tensor shape: {X_ohe_valid_tensor.shape}")
+logging.info(f"Train tensor shape: {X_ohe_train_tensor.shape}")
+logging.info(f"Valid tensor shape: {X_ohe_valid_tensor.shape}")
 
 # --- 4. 定义模型 (和以前一样) ---
 class VAE(nn.Module):
@@ -136,7 +140,7 @@ for epoch in range(epochs):
     
     avg_train_loss = train_loss / len(train_loader.dataset)
     f.write(f"Epoch: {epoch}. Train Loss: {avg_train_loss}\n")
-    print(f"Epoch: {epoch}. Train Loss: {avg_train_loss}")
+    logging.info(f"Epoch: {epoch}. Train Loss: {avg_train_loss}")
     
     # 保存模型
     torch.save(model.state_dict(), f"model/vae/vae_self_tv_sim_split_kl_weight_1_batch_size_{batch_size}_epochs{epoch}.chkpt")
@@ -155,8 +159,8 @@ for epoch in range(epochs):
     
         avg_valid_loss = valid_loss / len(valid_loader.dataset)
         f.write(f"Epoch: {epoch}. Valid Loss: {avg_valid_loss}\n")
-        print(f"Epoch: {epoch}. Valid Loss: {avg_valid_loss}")
+        logging.info(f"Epoch: {epoch}. Valid Loss: {avg_valid_loss}")
 
 f.close()
-print("训练完毕")
+logging.info("训练完毕")
 

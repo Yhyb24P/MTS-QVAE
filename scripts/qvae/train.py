@@ -11,16 +11,18 @@ from torch.utils.data import TensorDataset, DataLoader
 
 import sys
 import os
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 # 获取当前脚本 (train.py) 的目录
-# e.g., /home/yhshy/git_files/MTS-QBM-VAE/scripts/qvae
 current_script_dir = os.path.dirname(os.path.abspath(__file__))
-# 计算项目的根目录 (向上两级)
-# e.g., /home/yhshy/git_files/MTS-QBM-VAE
 project_root = os.path.abspath(os.path.join(current_script_dir, '..', '..'))
 # 将项目根目录添加到 Python 搜索路径
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
-    print(f"已将 {project_root} 添加到 sys.path")
+    logging.info(f"已将 {project_root} 添加到 sys.path")
 
 
 import kaiwu as kw
@@ -34,7 +36,7 @@ from kaiwu.classical import SimulatedAnnealingOptimizer
 
 # --- 1. 设置与常量 ---
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"使用设备: {device}")
+logging.info(f"使用设备: {device}")
 
 
 INPUT_DIM = 1540  # 70 * 22
@@ -53,30 +55,30 @@ def one_hot_encode(seq):
     seq2 = [mapping[i] for i in seq]
     return np.eye(22)[seq2]
 
-print("One-hot encoding training data...")
+logging.info("One-hot encoding training data...")
 X_ohe_train_list = []
 for i in tqdm(range(np.shape(X_train)[0])):
     seq = X_train.sequence[i]+'$'
     pad_seq = seq.ljust(70,'0')
     X_ohe_train_list.append(one_hot_encode(pad_seq))
 
-print("One-hot encoding validation data...")
+logging.info("One-hot encoding validation data...")
 X_ohe_valid_list = []
 for i in tqdm(range(np.shape(X_valid)[0])):
     seq = X_valid.sequence[i]+'$'
     pad_seq = seq.ljust(70,'0')
     X_ohe_valid_list.append(one_hot_encode(pad_seq))
     
-print("Converting training list to single tensor...")
+logging.info("Converting training list to single tensor...")
 X_ohe_train_tensor = torch.FloatTensor(np.array(X_ohe_train_list)).view(-1, INPUT_DIM)
 mean_x = X_ohe_train_tensor.mean().item()
-print(f"Calculated train_bias (mean_x): {mean_x}")
+logging.info(f"Calculated train_bias (mean_x): {mean_x}")
 
-print("Converting validation list to single tensor...")
+logging.info("Converting validation list to single tensor...")
 X_ohe_valid_tensor = torch.FloatTensor(np.array(X_ohe_valid_list)).view(-1, INPUT_DIM)
 
-print(f"Train tensor shape: {X_ohe_train_tensor.shape}")
-print(f"Valid tensor shape: {X_ohe_valid_tensor.shape}")
+logging.info(f"Train tensor shape: {X_ohe_train_tensor.shape}")
+logging.info(f"Valid tensor shape: {X_ohe_valid_tensor.shape}")
 
 # --- 3. 定义 QVAE 的组件 (编码器和解码器) ---
 class Encoder(nn.Module):
@@ -134,7 +136,7 @@ bm_prior = RestrictedBoltzmannMachine(
     num_visible=prior_vis, # 16
     num_hidden=prior_hid   # 16
 ).to(device)
-print(f"已初始化 RestrictedBoltzmannMachine 先验，总共 {bm_prior.num_nodes} 个节点 ({bm_prior.num_visible} 可见 + {bm_prior.num_hidden} 隐藏)。")
+logging.info(f"已初始化 RestrictedBoltzmannMachine 先验，总共 {bm_prior.num_nodes} 个节点 ({bm_prior.num_visible} 可见 + {bm_prior.num_hidden} 隐藏)。")
 
 sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100) 
 
@@ -188,7 +190,7 @@ for epoch in range(EPOCHS):
     
     log_msg_train = f"Epoch: {epoch}. Train Loss: {avg_train_total:.4f} (ELBO: {avg_train_elbo:.4f}, WD: {avg_train_wd:.4f})"
     f.write(log_msg_train + "\n")
-    print(log_msg_train)
+    logging.info(log_msg_train)
     
     torch.save(model.state_dict(), f"model/qvae/qvae_mts_kl_weight_1_batch_size_{BATCH_SIZE}_epochs{epoch}.chkpt")
 
@@ -219,8 +221,8 @@ for epoch in range(EPOCHS):
 
         log_msg_valid = f"Epoch: {epoch}. Valid Loss: {avg_valid_total:.4f} (ELBO: {avg_valid_elbo:.4f}, WD: {avg_valid_wd:.4f})"
         f.write(log_msg_valid + "\n")
-        print(log_msg_valid)
+        logging.info(log_msg_valid)
 
 f.close()
-print("QVAE 训练和评估结束")
+logging.info("QVAE 训练和评估结束")
 
