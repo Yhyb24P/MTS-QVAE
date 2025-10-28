@@ -25,16 +25,9 @@ kw.license.init(user_id="105879747841515522", sdk_code="4vCbDDWqIdUEXDdEHKK0L4Mt
 
 
 # --- TODO: 导入 QVAE 相关的库 ---
-try:
-    #  导入与 train_fixed.py 完全相同的类
-    from kaiwu_torch_plugin import QVAE, BoltzmannMachine, RestrictedBoltzmannMachine
-    from kaiwu.classical import SimulatedAnnealingOptimizer
-except ImportError:
-    print("="*50)
-    print(f"错误：无法导入 QVAE 库 (kaiwu_torch_plugin)。")
-    print(f"已将 {project_root} 添加到 sys.path，请检查该目录下是否存在 'kaiwu_torch_plugin' 文件夹。")
-    print("="*50)
-    raise
+
+from kaiwu_torch_plugin import QVAE, BoltzmannMachine, RestrictedBoltzmannMachine
+from kaiwu.classical import SimulatedAnnealingOptimizer
 
 # --- 1. 定义 QVAE 组件 ---
 INPUT_DIM = 1540  # 70 * 22
@@ -91,12 +84,9 @@ print(f"已初始化 RestrictedBoltzmannMachine 先验，总共 {bm_prior.num_no
 
 
 # 3. 实例化采样器
-# === 修正 ===
-# 移除了 'num_sweeps=500' 参数，因为它不被接受
 sampler = SimulatedAnnealingOptimizer(alpha=0.999)
 
 # 4. 实例化 QVAE 主模型
-#  此处参数必须与 train.py 中的 QVAE 实例化参数完全一致
 model = QVAE(
     encoder=encoder,
     decoder=decoder,
@@ -108,8 +98,7 @@ model = QVAE(
 ).to(device)
 
 # 5. 加载训练好的权重
-# [正确] 路径已更新为 BS=512 的模型
-model_path = "model/qvae_mts_kl_weight_1_batch_size_512_epochs34.chkpt"
+model_path = "model/qvae/qvae_mts_kl_weight_1_batch_size_512_epochs34.chkpt"
 print(f"从以下路径加载模型: {model_path}")
 model.load_state_dict(torch.load(model_path, map_location=device))
 model.eval() # 设置为评估模式
@@ -129,18 +118,15 @@ with torch.no_grad():
     trained_prior = model.bm.to(device) 
     
     # 2. 配置采样器以生成 N_SAMPLES_TO_GENERATE 个样本
-    # [正确] 这是设置样本量的正确方法
     sampler.size_limit = N_SAMPLES_TO_GENERATE
     
-    # 3. 调用正确的 sample() 接口
+    # 3. sample() 接口
     print("运行采样器以从先验获取 z_samples... (这可能需要一些时间)")
     z_samples = trained_prior.sample(sampler) # 返回 (N_SAMPLES, 32)
     z_samples = z_samples.to(device)
     
-    # === 关键修复：定义实际样本数量 ===
     actual_samples = z_samples.shape[0] # 使用 z_samples 的实际行数
     print(f"已生成 {actual_samples} 个隐样本。")
-    # ==================================
     
     # 4. 使用解码器解码离散样本
     sample_logits = model.decoder(z_samples)
@@ -148,10 +134,9 @@ with torch.no_grad():
     # 5. 将 logits 转换为概率 (Sigmoid) 并移回 CPU
     sample_probs = torch.sigmoid(sample_logits).cpu()
     
-    # === 修复：使用 actual_samples 替换原来未定义的变量 ===
-    sample_probs = sample_probs.view(actual_samples, 70, 22)        
-# --- 4. 后处理 ---
+    sample_probs = sample_probs.view(actual_samples, 70, 22)   
 
+# --- 4. 解码并保存生成的序列 ---
 print("解码序列中...")
 sampled_seqs = []
 for i, seq_probs in enumerate(sample_probs):
@@ -177,7 +162,7 @@ print('序列总数:', len(filtered_seq_to_check))
 filtered_seq_to_check = filtered_seq_to_check.drop_duplicates(subset='sequence').reset_index().drop('index', axis=1)
 print('去重后剩余序列总数', len(filtered_seq_to_check))
 
-output_fasta_name = 'qdata/amts_qvae_generated'
+output_fasta_name = 'data/qvae/output/amts'
 print(f"正在将最终序列写入 {output_fasta_name}.fasta")
 write_fasta(output_fasta_name, filtered_seq_to_check)
 

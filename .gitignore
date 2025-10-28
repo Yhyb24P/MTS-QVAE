@@ -1,37 +1,48 @@
-# Python virtual environment
+# ============== 1. Python 虚拟环境 ==============
 qvae/
 unirep/
 venv/
 env/
+.venv/
 
-# Python cache
+# ============== 2. Python 缓存 & 编译产物 ==============
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.so
 
-# Jupyter Notebook
+# ============== 3. Jupyter Notebook ==============
 .ipynb_checkpoints/
+*.ipynb_checkpoints
 
-# IDE
+# ============== 4. IDE / 编辑器 ==============
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# Large data files (这些应交由 Git LFS 管理)
-qdata/*.npz
-qdata/*.pkl
-qdata/*.chkpt
-model/*.chkpt
+# ============== 5. 大文件 / 数据文件 ==============
+*.npz
+*.pkl
+*.chkpt
+*.fasta
 
-# Secrets
+# ============== 6. 密钥 & 敏感文件 ==============
 .env
+.env.*
 ssh-key
 ssh-key.pub
+id_rsa
+id_rsa.pub
+*.pem
+*.key
 
-# Wheel 文件（可选，如果你不想提交）
+# ============== 7. 构建产物 / Wheel ==============
 kaiwu-1.2.0-cp310-none-manylinux1_x86_64.whl
+*.whl
 
-# 忽略所有数据目录
-qdata/
-data/
-model/
+# ============== 8. macOS / Windows 垃圾 ==============
+.DS_Store
+Thumbs.db

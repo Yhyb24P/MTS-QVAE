@@ -12,10 +12,7 @@ from torch.utils.data import TensorDataset, DataLoader
 import sys
 import os
 # 获取当前脚本 (train.py) 的目录
-# e.g., /home/yhshy/git_files/MTS-QBM-VAE/scripts/qvae
 current_script_dir = os.path.dirname(os.path.abspath(__file__))
-# 计算项目的根目录 (向上两级)
-# e.g., /home/yhshy/git_files/MTS-QBM-VAE
 project_root = os.path.abspath(os.path.join(current_script_dir, '..', '..'))
 # 将项目根目录添加到 Python 搜索路径
 if project_root not in sys.path:
@@ -136,7 +133,14 @@ bm_prior = RestrictedBoltzmannMachine(
 ).to(device)
 print(f"已初始化 RestrictedBoltzmannMachine 先验，总共 {bm_prior.num_nodes} 个节点 ({bm_prior.num_visible} 可见 + {bm_prior.num_hidden} 隐藏)。")
 
-sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100) 
+# --- 修改求解器  ---
+
+sampler = SimulatedAnnealingOptimizer(
+    initial_temperature=500,  # 提高初始温度以进行更广泛的探索
+    alpha=0.999,              # 保持慢速降温
+    iterations_per_t=100,     # 增加每个温度的迭代深度
+    size_limit=100            # 保持输出解的数量不变
+)
 
 model = QVAE(
     encoder=encoder,
@@ -151,7 +155,7 @@ model = QVAE(
 optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
 # --- 6. 训练与验证循环  ---
-f = open("data/qvae/model/loss_qvae_w.txt", "a")
+f = open("data/qvae-v/model/loss_qvae_w.txt", "a")
 
 for epoch in range(EPOCHS):
     # --- 训练 ---
@@ -190,7 +194,7 @@ for epoch in range(EPOCHS):
     f.write(log_msg_train + "\n")
     print(log_msg_train)
     
-    torch.save(model.state_dict(), f"model/qvae/qvae_mts_kl_weight_1_batch_size_{BATCH_SIZE}_epochs{epoch}.chkpt")
+    torch.save(model.state_dict(), f"model/qvae-v/qvae_mts_kl_weight_1_batch_size_{BATCH_SIZE}_epochs{epoch}.chkpt")
 
     # --- 验证 ---
     model.eval()
@@ -223,4 +227,3 @@ for epoch in range(EPOCHS):
 
 f.close()
 print("QVAE 训练和评估结束")
-
