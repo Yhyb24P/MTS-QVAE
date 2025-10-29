@@ -25,9 +25,9 @@ def simple_fasta_reader(fasta_file):
         sys.exit(1)
 
 # --- 2. 定义输入和输出文件路径 ---
-INPUT_FASTA = 'data/qvae-v/output/amts_bs512_epoch32_n637.fasta' 
+INPUT_FASTA = 'data/qvae-v/output/generated_seqs_e34_b2048_n1000.fasta' 
 
-OUTPUT_NPZ = 'data/qvae-v/output/amts_bs512_epoch32_n637.npz' 
+OUTPUT_NPZ = 'data/qvae-v/output/generated_seqs_e34_b2048_n1000.npz' 
 
 # --- 3. 加载序列 ---
 print(f"正在从 {INPUT_FASTA} 加载序列...")

@@ -53,8 +53,8 @@ prior_vis = LATENT_DIM // 2
 prior_hid = LATENT_DIM - prior_vis
 
 # 确保目录存在
-log_save_dir = "data/qvae/model"
-model_save_dir = "model/qvae"
+log_save_dir = "data/qvae-v/model"
+model_save_dir = "model/qvae-v"
 os.makedirs(log_save_dir, exist_ok=True)
 os.makedirs(model_save_dir, exist_ok=True)
 

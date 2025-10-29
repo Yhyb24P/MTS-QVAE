@@ -117,14 +117,14 @@ print(f"聚类中心计算完毕。 Shape: {cluster_center.shape}") # 应为 (4,
 # --- 4. 加载 AMTS 序列  ---
 
 
-in_fasta = 'data/qvae-v/output/amts_bs512_epoch32_n637' 
+in_fasta = 'data/qvae-v/output/generated_seqs_e34_b2048_n1000' 
 ini_amts_df = pd.DataFrame(read_fasta(in_fasta), columns = ['name', 'sequence'])
 
 # 同样过滤，只保留 'M' 开头的序列
 amts_df = ini_amts_df[ini_amts_df.sequence.str.startswith('M')]
 
 # 加载人工序列的预计算嵌入
-arrays = np.load('data/qvae-v/output/amts_bs512_epoch32_n637' + '.npz', allow_pickle=True) 
+arrays = np.load('data/qvae-v/output/generated_seqs_e34_b2048_n1000' + '.npz', allow_pickle=True) 
 embd_for_amts = []
 amts_data_embd_arranged = []
 for i in list(arrays.keys()):
