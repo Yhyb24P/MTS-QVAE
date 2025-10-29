@@ -421,13 +421,11 @@ with open(log_file_path, 'a') as f: # 'a' = 附加模式
             valid_history_elbo.append(avg_valid_elbo)
             valid_history_cost.append(avg_valid_cost)
 
-            # --- 修正: 更新日志以包含 BM Loss ---
             log_msg_valid = (
                 f"Epoch: {epoch}. Valid VAE Loss: {avg_valid_total:.4f} "
                 f"(ELBO: {avg_valid_elbo:.4f}, Cost: {avg_valid_cost:.4f}, WD: {avg_valid_wd:.4f}) | "
                 f"Valid BM Loss: {avg_valid_bm_loss:.4f}"
             )
-            # --- 结束修正 ---
 
             f.write(log_msg_valid + "\n")
             logging.info(log_msg_valid)
