@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import pickle # <-- 新增导入
+import pickle 
 from tqdm import tqdm
 import re
 from Bio import SeqIO
@@ -9,7 +9,7 @@ import torch.nn as nn
 from torch.nn import functional as F
 import torch
 import argparse # 导入 argparse
-import torch.multiprocessing as mp # <-- 新增导入
+import torch.multiprocessing as mp 
 
 import sys
 import os
@@ -33,64 +33,97 @@ kw.license.init(user_id="105879747841515522", sdk_code="4vCbDDWqIdUEXDdEHKK0L4Mt
 
 
 # --- 导入 QVAE 相关的库 ---
-
 from kaiwu_torch_plugin import QVAE, BoltzmannMachine, RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
 
-# --- 1. 定义 QVAE 组件 (类定义可以放在顶层) ---
-INPUT_DIM = 1540  # 70 * 22
+# --- 1. 定义 QVAE 组件 (必须与 train.py 完全匹配) ---
+INPUT_DIM = 1540  # 70 * 22 
 LATENT_DIM = 32   # 32 维隐空间
+MAX_LEN = 70      # 序列最大长度
+CHANNELS = 22     # 20 个氨基酸 + '$' + '0'
+
+# RBM (先验) 设置 (必须匹配)
+prior_vis = LATENT_DIM // 2
+prior_hid = LATENT_DIM - prior_vis
+
 
 class Encoder(nn.Module):
-    """编码器： p(x) -> q_logits (用于 q(z|x))"""
-    def __init__(self, input_dim, latent_dim):
+    """
+    编码器：使用 1D-CNN (与 train.py 匹配)
+    """
+    def __init__(self, input_dim, latent_dim, channels=CHANNELS, seq_len=MAX_LEN):
         super(Encoder, self).__init__()
-        self.fc1 = nn.Linear(input_dim, 512)
+        self.channels = channels
+        self.seq_len = seq_len
+        
+        self.conv1 = nn.Conv1d(in_channels=channels, out_channels=64, kernel_size=5, padding=2)
+        self.conv2 = nn.Conv1d(in_channels=64, out_channels=128, kernel_size=3, padding=1)
+        self.pool = nn.MaxPool1d(kernel_size=2, stride=2) # 70 -> 35
+        
+        self.flat_dim = 128 * (seq_len // 2) 
+        
+        self.fc1 = nn.Linear(self.flat_dim, 512)
         self.fc_logits = nn.Linear(512, latent_dim)
         self.relu = nn.ReLU()
-    def forward(self, x):
-        h1 = self.relu(self.fc1(x))
+
+    def forward(self, x): # x shape: (B, 1540)
+        h = x.view(-1, self.channels, self.seq_len) # (B, 22, 70)
+        h = self.relu(self.conv1(h))
+        h = self.relu(self.conv2(h))
+        h = self.pool(h) # (B, 128, 35)
+        h = h.view(-1, self.flat_dim) # (B, 128 * 35)
+        h1 = self.relu(self.fc1(h))
         return self.fc_logits(h1)
 
 class Decoder(nn.Module):
-    """解码器： z -> recon_logits (用于 p(x|z))"""
-    def __init__(self, latent_dim, output_dim):
+    """
+    解码器：使用 1D-CNN (与 train.py 匹配)
+    """
+    def __init__(self, latent_dim, output_dim, channels=CHANNELS, seq_len=MAX_LEN):
         super(Decoder, self).__init__()
+        self.channels = channels
+        self.seq_len = seq_len
+        self.start_len = seq_len // 2 # 35
+        self.start_flat_dim = 128 * self.start_len # 128 * 35
+        
         self.fc3 = nn.Linear(latent_dim, 512)
-        self.fc4 = nn.Linear(512, output_dim)
+        self.fc_upscale = nn.Linear(512, self.start_flat_dim)
+        
+        self.unpool = nn.Upsample(scale_factor=2) # 35 -> 70
+        self.tconv1 = nn.ConvTranspose1d(in_channels=128, out_channels=64, kernel_size=3, padding=1)
+        self.tconv2 = nn.ConvTranspose1d(in_channels=64, out_channels=channels, kernel_size=5, padding=2)
+        
         self.relu = nn.ReLU()
-    def forward(self, z):
-        h3 = self.relu(self.fc3(z.float()))
-        return self.fc4(h3)
 
-# --- (核心修复) 必须使用 'if __name__ == "__main__":' ---
-# 当使用 'spawn' 启动方法时，这是防止无限循环所必需的
+    def forward(self, z): # z shape: (B, latent_dim)
+        h = self.relu(self.fc3(z.float()))
+        h = self.relu(self.fc_upscale(h)) # (B, 128 * 35)
+        h = h.view(-1, 128, self.start_len) # (B, 128, 35)
+        h = self.unpool(h) # (B, 128, 70)
+        h = self.relu(self.tconv1(h)) # (B, 64, 70)
+        h = self.tconv2(h) # (B, 22, 70) -> Logits, no activation
+        return h.view(-1, self.channels * self.seq_len) # (B, 1540)
+
+# --- 必须使用 'if __name__ == "__main__":' ---
 if __name__ == "__main__":
 
-    # --- (核心修复) 设置 'spawn' 启动方法 ---
-    # 必须在任何 CUDA 或多进程代码之前调用
+    # --- 设置 'spawn' 启动方法 ---
     try:
-        # 'force=True' 确保即使它已被设置，我们也能覆盖它
         mp.set_start_method('spawn', force=True) 
         logging.info("已将 multiprocessing 启动方法设置为 'spawn' 以兼容 CUDA。")
     except RuntimeError as e:
-        # 如果在特定环境 (如 Jupyter) 中运行，可能无法设置
         logging.warning(f"无法设置 'spawn' 启动方法 (可能已设置): {e}")
-    # --- 结束修复 ---
+    # --- 结束 ---
 
-    # --- 0. 添加命令行参数解析 ---
+    # --- 0. 命令行参数解析 ---
     parser = argparse.ArgumentParser(description="Generate sequences from a trained QVAE model.")
-    parser.add_argument("--epoch", type=int, required=True, 
-                        help="要加载的训练 epoch 编号。")
     parser.add_argument("--batch_size", type=int, default=2048, 
                         help="训练时使用的 BATCH_SIZE (用于定位 .chkpt 和 mean_x.pkl 文件)。")
     parser.add_argument("--n_samples", type=int, default=5000, 
                         help="要生成的序列数量。")
     args = parser.parse_args()
 
-    # --- (新) 尽早获取参数 ---
     N_SAMPLES = args.n_samples
-    EPOCH_TO_LOAD = args.epoch
     BATCH_SIZE_TRAINED = args.batch_size
 
 
@@ -98,33 +131,29 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logging.info(f"使用设备: {device}")
 
-    # RBM (先验) 设置
-    prior_vis = LATENT_DIM // 2
-    prior_hid = LATENT_DIM - prior_vis
+    # 定义模型保存目录 (与 train.py 匹配)
+    model_save_dir = "model/qvae-v" 
 
-    # --- (动态加载 mean_x) ---
-    # (路径更新) 匹配您新的 'model/qvae/' 目录
-    mean_x_model_dir = "model/qvae" 
-    mean_x_load_path = os.path.join(mean_x_model_dir, f"mean_x_bs{BATCH_SIZE_TRAINED}.pkl")
+    # --- 加载 mean_x ---
+    mean_x_load_path = os.path.join(model_save_dir, f"mean_x_bs{BATCH_SIZE_TRAINED}.pkl")
     
     try:
         with open(mean_x_load_path, 'rb') as f:
             mean_x_value = pickle.load(f)
         logging.info(f"成功从 {mean_x_load_path} 加载 train_bias (mean_x): {mean_x_value}")
     except FileNotFoundError:
-        logging.warning(f"警告: 找不到 {mean_x_load_path}。")
-        logging.warning("请确保您已运行 train_fixed.py (使用相同的 BATCH_SIZE) 来生成此文件。")
-        logging.warning("将回退到硬编码值 (不推荐)...")
-        mean_x_value = 0.04545454680919647 # (回退值)
+        logging.error(f"错误: 找不到 {mean_x_load_path}。")
+        logging.error(f"请确保您已运行 train.py (使用 BATCH_SIZE={BATCH_SIZE_TRAINED}) 来生成此文件。")
+        sys.exit(1)
     except Exception as e:
         logging.error(f"加载 mean_x 失败: {e}")
         sys.exit(1)
     # --- 结束 ---
 
 
-    # 1. 实例化所有组件
-    encoder = Encoder(INPUT_DIM, LATENT_DIM).to(device)
-    decoder = Decoder(LATENT_DIM, INPUT_DIM).to(device)
+    # 1. 实例化 CNN 组件
+    encoder = Encoder(INPUT_DIM, LATENT_DIM, channels=CHANNELS, seq_len=MAX_LEN).to(device)
+    decoder = Decoder(LATENT_DIM, INPUT_DIM, channels=CHANNELS, seq_len=MAX_LEN).to(device)
 
     # 2.  实例化玻尔兹曼机先验 (RBM)
     bm_prior = RestrictedBoltzmannMachine(
@@ -133,7 +162,7 @@ if __name__ == "__main__":
     ).to(device)
     logging.info(f"已初始化 RestrictedBoltzmannMachine 先验，总共 {bm_prior.num_nodes} 个节点。")
 
-    # 3. (优化) 实例化强探索采样器
+    # 3. 实例化强探索采样器
     logging.info("配置强探索采样器 (SimulatedAnnealingOptimizer)...")
     sampler = SimulatedAnnealingOptimizer(
         initial_temperature=500.0,
@@ -141,10 +170,7 @@ if __name__ == "__main__":
         cutoff_temperature=0.001,
         iterations_per_t=100,
         size_limit=N_SAMPLES,         # 在此处指定样本数量
-        # --- (修复) 恢复 process_num=-1 ---
-        # 既然我们使用了 'spawn'，我们现在可以安全地使用多进程
-        process_num = -1
-        # --- 结束修复 ---
+        process_num = -1              # 使用 'spawn' 时可以安全使用多进程
     )
     logging.info(f"采样器进程数设置为: {sampler.process_num} (已启用 'spawn' 模式)")
 
@@ -155,13 +181,12 @@ if __name__ == "__main__":
         bm=bm_prior,
         sampler=sampler,
         dist_beta=1.0,           
-        mean_x=mean_x_value, # 传递加载的或回退的 float 类型的 mean_x
+        mean_x=mean_x_value, # 传递加载的 float 类型的 mean_x
         num_vis=bm_prior.num_visible 
     ).to(device)
 
-    # 5. 加载训练好的权重
-    # (路径更新) 匹配您新的 'model/qvae/' 目录
-    model_load_path = f"model/qvae/qvae_mts_kl_weight_1_batch_size_{BATCH_SIZE_TRAINED}_epochs{EPOCH_TO_LOAD}.chkpt"
+    # 5. 加载训练好的 'best' 权重
+    model_load_path = os.path.join(model_save_dir, f"qvae_cnn_best_model_bs{BATCH_SIZE_TRAINED}.chkpt")
     logging.info(f"正在从 {model_load_path} 加载模型权重...")
 
     try:
@@ -169,7 +194,7 @@ if __name__ == "__main__":
         logging.info("模型权重加载成功。")
     except FileNotFoundError:
         logging.error(f"错误: 找不到模型文件 {model_load_path}")
-        logging.error("请确保 --epoch 和 --batch_size 参数与您训练保存的文件名匹配。")
+        logging.error("请确保 --batch_size 参数与您训练保存的文件名匹配。")
         sys.exit(1) # 退出脚本
 
     model.eval() # 切换到评估模式
@@ -182,30 +207,18 @@ if __name__ == "__main__":
     with torch.no_grad():
         logging.info(f"正在从 RBM 先验中采样 {N_SAMPLES} 个隐变量...")
         
-        # --- (核心修复) 使用 RBM 模型的 .sample() 方法 ---
-        # 根据您上传的 'abstract_boltzmann_machine.py' 源码，
-        # RBM 基类有一个 'sample' 方法，该方法接收一个采样器 (sampler) 作为参数。
-        # 它会:
-        # 1. 调用 self.get_ising_matrix() (在内部转换为 CPU NumPy 数组)
-        # 2. 调用 sampler.solve(ising_mat) (在 CPU 上使用多进程)
-        # 3. 将 CPU 结果转换回 {0, 1} 并移回 RBM 所在的设备 (CUDA)
-        #
-        # 这正是我们需要的正确调用方式。
         try:
-            # model.sampler (SimulatedAnnealingOptimizer) 在初始化时
-            # 已经设置了 size_limit=N_SAMPLES
+            # RBM 基类有 'sample' 方法，该方法接收一个采样器
             z_samples = model.bm.sample(model.sampler)
             logging.info("采样完成。")
         except Exception as e:
             logging.error(f"调用 model.bm.sample(model.sampler) 时出错: {e}")
-            logging.error("这可能表明 RBM、采样器或它们之间的交互存在问题。")
             logging.exception("详细错误信息:") # 打印完整的堆栈跟踪
             sys.exit(1)
-        # --- 结束修复 ---
         
-        z_samples = z_samples.to(device) # 确保样本在正确的设备上 (虽然 .sample() 应该已经做了)
+        z_samples = z_samples.to(device) # 确保样本在正确的设备上
         
-        actual_samples = z_samples.shape[0] # 使用 z_samples 的实际行数
+        actual_samples = z_samples.shape[0] 
         logging.info(f"已生成 {actual_samples} 个隐样本。")
         
         # 4. 使用解码器解码离散样本
@@ -214,7 +227,8 @@ if __name__ == "__main__":
         # 5. 将 logits 转换为概率 (Sigmoid) 并移回 CPU
         sample_probs = torch.sigmoid(sample_logits).cpu()
         
-        sample_probs = sample_probs.view(actual_samples, 70, 22)   
+        # 确保 reshape 维度与 CNN 输出匹配
+        sample_probs = sample_probs.view(actual_samples, MAX_LEN, CHANNELS) # (B, 70, 22)   
 
     # --- 4. 解码并保存生成的序列 ---
     logging.info("解码序列中...")
@@ -244,10 +258,9 @@ if __name__ == "__main__":
     logging.info(f'序列总数 (去重后): {len(filtered_seq_to_check)}')
 
     # --- 5. 保存到 FASTA 文件 ---
-    # (路径更新) 匹配您的模型路径 'model/qvae/'
     output_dir = "data/qvae-v/output" 
     os.makedirs(output_dir, exist_ok=True)
-    output_filename = os.path.join(output_dir, f"generated_seqs_e{EPOCH_TO_LOAD}_b{BATCH_SIZE_TRAINED}_n{N_SAMPLES}.fasta")
+    output_filename = os.path.join(output_dir, f"generated_seqs_best_b{BATCH_SIZE_TRAINED}_n{N_SAMPLES}.fasta")
 
     with open(output_filename, 'w') as f:
         for index, row in filtered_seq_to_check.iterrows():
@@ -255,4 +268,3 @@ if __name__ == "__main__":
             f.write(row['sequence'] + "\n")
 
     logging.info(f"已将 {len(filtered_seq_to_check)} 条生成的序列保存到: {output_filename}")
-
