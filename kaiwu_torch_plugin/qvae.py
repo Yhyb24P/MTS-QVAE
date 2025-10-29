@@ -62,17 +62,12 @@ class QVAE(torch.nn.Module):
         zeta = posterior_dist.reparameterize(self.is_training)
         return posterior_dist, zeta
 
-    def _cross_entropy(
+    def _calc_positive_energy(
         self, logit_q: torch.Tensor, log_ratio: torch.Tensor
     ) -> torch.Tensor:
-        """Compute the cross-entropy term for the overlap distribution proposed in DVAE++
-
-        Args:
-            logit_q (torch.Tensor): Log-odds of Bernoulli distribution defined for each variable
-            log_ratio (torch.Tensor): Log(r(ζ|z=1)/r(ζ|z=0)) for each ζ
-
-        Returns:
-            torch.Tensor: Cross-entropy tensor for each ζ
+        """
+        Compute the Positive Phase Energy E_q[E(z)]
+        This was formerly _cross_entropy
         """
         # Split logit_q into two parts
         if self.bm.num_nodes != logit_q.shape[1]:
@@ -89,56 +84,90 @@ class QVAE(torch.nn.Module):
         log_ratio1 = log_ratio[:, : self.num_var1]
         q1_pert = torch.sigmoid(logit_q1 + log_ratio1)
 
-        # Compute cross-entropy
-        cross_entropy = -torch.matmul(
+        # Compute positive phase energy: E_q[E(z)]
+        # E(z) = z*h + z*W*z (approximated)
+        positive_energy = -torch.matmul(
             torch.cat([q1, q2], dim=-1), self.bm.linear_bias
         ) + -torch.sum(
             torch.matmul(q1_pert, self.bm.quadratic_coef) * q2, dim=1, keepdim=True
         )
-        cross_entropy = cross_entropy.squeeze(dim=1)
-        s_neg = self.bm.sample(self.sampler)
-        cross_entropy = cross_entropy - self.bm(s_neg).mean()
-        return cross_entropy
+        positive_energy = positive_energy.squeeze(dim=1)
+        
+        # --- 修正 ---
+        # 移除了负相采样 (s_neg) 和减法。
+        # VAE 损失 (neg_elbo) 不应包含负相采样。
+        # 此函数现在只返回 E_q[E(z)]
+        # s_neg = self.bm.sample(self.sampler)
+        # cross_entropy = cross_entropy - self.bm(s_neg).mean() 
+        # --- 结束修正 ---
+        
+        return positive_energy
 
     def _kl_dist_from(self, posterior, post_samples):
-        """Compute KL divergence
+        """Compute KL divergence (minus the log(Z) constant)
 
         Args:
             posterior: Posterior distribution object
             post_samples: Posterior distribution samples
 
         Returns:
-            torch.Tensor: KL divergence tensor
+            torch.Tensor: KL divergence tensor [ E_q[E(z)] - H(q) ]
         """
         entropy = 0
         logit_q = 0
         log_ratio = 0
-        entropy += torch.sum(posterior.entropy(), dim=1)
+        entropy += torch.sum(posterior.entropy(), dim=1) # This is H(q)
 
         logit_q = posterior.logit_mu
         log_ratio = posterior.log_ratio(post_samples)
-        cross_entropy = self._cross_entropy(logit_q, log_ratio)
-        kl = cross_entropy - entropy
+        
+        # This is E_q[E(z)]
+        positive_energy = self._calc_positive_energy(logit_q, log_ratio)
+        
+        # kl = E_q[E(z)] - H(q)
+        # This is D_KL(q||p) - log(Z).
+        # Since log(Z) is constant w.r.t. VAE parameters (phi, theta),
+        # minimizing this is equivalent to minimizing D_KL for the VAE.
+        kl = positive_energy - entropy
 
         return kl
 
+    def get_bm_loss(self, posterior, zeta):
+        """
+        Computes the Contrastive Divergence (CD) loss for the BM parameters {W, h}.
+        Loss_BM = E_q[E(z)] - E_p[E(z)]
+        """
+        logit_q = posterior.logit_mu
+        log_ratio = posterior.log_ratio(zeta)
+        
+        # 1. Positive Phase Energy: E_q[E(z)]
+        # (Detached, as gradients should only flow to BM params from here)
+        pos_energy = self._calc_positive_energy(logit_q.detach(), log_ratio.detach()).mean()
+
+        # 2. Negative Phase Energy: E_p[E(z)]
+        s_neg = self.bm.sample(self.sampler)
+        
+        # ASSUMPTION: self.bm() (即 forward) 返回 NEGATIVE energy (-E(z))
+        # 这是 EBM 库的标准做法。
+        neg_energy_from_bm = self.bm(s_neg).mean()
+        
+        # E_p[E(z)] = - E_p[-E(z)]
+        neg_energy = -neg_energy_from_bm 
+        
+        # 3. CD Loss (对比散度损失)
+        bm_loss = pos_energy - neg_energy
+        
+        return bm_loss
+
     def neg_elbo(self, x, kl_beta):
-        """Compute negative ELBO loss
+        """Compute negative ELBO loss (for VAE parameters)
 
         Args:
             x (torch.Tensor): Input data
             kl_beta (float): Weight coefficient for KL term
 
         Returns:
-            tuple: (output, recon_x, neg_elbo, wd_loss, total_kl, cost, q, zeta)
-                output: Reconstructed output (sigmoid activated)
-                recon_x: Reconstructed data
-                neg_elbo: Negative ELBO loss
-                wd_loss: Weight decay loss
-                total_kl: KL divergence
-                cost: Reconstruction loss
-                q: Encoder output
-                zeta: Posterior sample
+            tuple: (output, recon_x, neg_elbo, wd_loss, total_kl, cost, q, posterior, zeta)
         """
         # Subtract mean from input
         encoder_x = x - self.train_bias
@@ -152,23 +181,26 @@ class QVAE(torch.nn.Module):
         # Apply sigmoid
         output = torch.sigmoid(output_dist.logit_mu)
 
-        # Compute KL
+        # Compute KL (E_q[E(z)] - H(q))
         total_kl = self._kl_dist_from(posterior, zeta)
         total_kl = torch.mean(total_kl)
+        
         # Expected log prob p(x| z)
         cost = -output_dist.log_prob_per_var(x)  # [256, 784]
         cost = torch.sum(cost, dim=1)  # [256], reconstruction loss per sample
         cost = torch.mean(cost)
 
         # Compute negative ELBO per sample, then average
+        # neg_elbo = (E_q[E(z)] - H(q)) + Cost
         neg_elbo = total_kl * kl_beta + cost  # scalar
 
-        # Weight decay loss
+        # Weight decay loss (for BM parameters)
         w_weight_decay = 0.01 * torch.sum(self.bm.quadratic_coef**2)
         b_weight_decay = 0.005 * torch.sum(self.bm.linear_bias**2)
         wd_loss = w_weight_decay + b_weight_decay
 
-        return output, recon_x, neg_elbo, wd_loss, total_kl, cost, q, zeta
+        # --- 修正: 返回 posterior 和 zeta 以便计算 BM loss ---
+        return output, recon_x, neg_elbo, wd_loss, total_kl, cost, q, posterior, zeta
 
     def forward(self, x):
         """Forward propagation
@@ -188,3 +220,4 @@ class QVAE(torch.nn.Module):
         recon_x = self.decoder(zeta)
 
         return recon_x, posterior, q, zeta
+

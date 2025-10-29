@@ -1,0 +1,464 @@
+使用标准 ELBO 损失 (Cost + KL)
+Epoch: 0. Train Loss: 213.7827 (ELBO: 213.7823, Cost: 237.1875, WD: 0.0004)
+Epoch: 0. Valid Loss: 173.0983 (ELBO: 173.0976, Cost: 198.2636, WD: 0.0008)
+Epoch: 0. New best validation loss: 173.0983. Saving model...
+Epoch: 0. 当前学习率: 0.0005
+Epoch: 1. Train Loss: 216.2935 (ELBO: 216.2919, Cost: 239.2589, WD: 0.0016)
+Epoch: 1. Valid Loss: 238.2324 (ELBO: 238.2297, Cost: 262.7314, WD: 0.0027)
+Epoch: 1. 当前学习率: 0.0005
+Epoch: 2. Train Loss: 197.8641 (ELBO: 197.8597, Cost: 224.9670, WD: 0.0044)
+Epoch: 2. Valid Loss: 211.2416 (ELBO: 211.2350, Cost: 243.4829, WD: 0.0065)
+Epoch: 2. 当前学习率: 0.0005
+Epoch: 3. Train Loss: 221.0747 (ELBO: 221.0655, Cost: 254.9680, WD: 0.0092)
+Epoch: 3. Valid Loss: 220.5632 (ELBO: 220.5507, Cost: 255.2066, WD: 0.0124)
+Epoch: 3. 当前学习率: 0.0005
+Epoch: 4. Train Loss: 201.4931 (ELBO: 201.4768, Cost: 240.6862, WD: 0.0163)
+Epoch: 4. Valid Loss: 202.6553 (ELBO: 202.6342, Cost: 245.9309, WD: 0.0210)
+Epoch: 4. 当前学习率: 0.0001
+Epoch: 5. Train Loss: 198.6735 (ELBO: 198.6515, Cost: 242.4841, WD: 0.0220)
+Epoch: 5. Valid Loss: 186.7002 (ELBO: 186.6771, Cost: 230.4314, WD: 0.0231)
+Epoch: 5. 当前学习率: 0.0001
+Epoch: 6. Train Loss: 169.3322 (ELBO: 169.3081, Cost: 213.3219, WD: 0.0241)
+Epoch: 6. Valid Loss: 160.8000 (ELBO: 160.7748, Cost: 206.4568, WD: 0.0252)
+Epoch: 6. New best validation loss: 160.8000. Saving model...
+Epoch: 6. 当前学习率: 0.0001
+Epoch: 7. Train Loss: 157.6153 (ELBO: 157.5890, Cost: 204.1484, WD: 0.0263)
+Epoch: 7. Valid Loss: 160.3296 (ELBO: 160.3021, Cost: 207.1100, WD: 0.0274)
+Epoch: 7. New best validation loss: 160.3296. Saving model...
+Epoch: 7. 当前学习率: 0.0001
+Epoch: 8. Train Loss: 159.0150 (ELBO: 158.9865, Cost: 205.6827, WD: 0.0285)
+Epoch: 8. Valid Loss: 159.0183 (ELBO: 158.9885, Cost: 205.9310, WD: 0.0298)
+Epoch: 8. New best validation loss: 159.0183. Saving model...
+Epoch: 8. 当前学习率: 0.0001
+Epoch: 9. Train Loss: 151.0105 (ELBO: 150.9795, Cost: 199.1637, WD: 0.0310)
+Epoch: 9. Valid Loss: 144.9347 (ELBO: 144.9023, Cost: 194.6480, WD: 0.0323)
+Epoch: 9. New best validation loss: 144.9347. Saving model...
+Epoch: 9. 当前学习率: 0.0001
+Epoch: 10. Train Loss: 135.6940 (ELBO: 135.6604, Cost: 186.5338, WD: 0.0336)
+Epoch: 10. Valid Loss: 132.7301 (ELBO: 132.6951, Cost: 184.6764, WD: 0.0350)
+Epoch: 10. New best validation loss: 132.7301. Saving model...
+Epoch: 10. 当前学习率: 0.0001
+Epoch: 11. Train Loss: 127.3273 (ELBO: 127.2909, Cost: 180.0346, WD: 0.0363)
+Epoch: 11. Valid Loss: 131.1111 (ELBO: 131.0733, Cost: 184.5535, WD: 0.0378)
+Epoch: 11. New best validation loss: 131.1111. Saving model...
+Epoch: 11. 当前学习率: 0.0001
+Epoch: 12. Train Loss: 128.0809 (ELBO: 128.0418, Cost: 182.2230, WD: 0.0391)
+Epoch: 12. Valid Loss: 135.5727 (ELBO: 135.5321, Cost: 190.4722, WD: 0.0406)
+Epoch: 12. 当前学习率: 0.0001
+Epoch: 13. Train Loss: 131.3979 (ELBO: 131.3559, Cost: 186.7935, WD: 0.0420)
+Epoch: 13. Valid Loss: 138.8698 (ELBO: 138.8263, Cost: 194.6124, WD: 0.0435)
+Epoch: 13. 当前学习率: 0.0001
+Epoch: 14. Train Loss: 132.1208 (ELBO: 132.0759, Cost: 188.0224, WD: 0.0450)
+Epoch: 14. Valid Loss: 137.8542 (ELBO: 137.8077, Cost: 194.4644, WD: 0.0465)
+Epoch: 14. 当前学习率: 0.0001
+Epoch: 15. Train Loss: 128.5869 (ELBO: 128.5389, Cost: 186.5863, WD: 0.0480)
+Epoch: 15. Valid Loss: 132.1949 (ELBO: 132.1453, Cost: 191.4094, WD: 0.0496)
+Epoch: 15. 当前学习率: 2e-05
+Epoch: 16. Train Loss: 124.6380 (ELBO: 124.5881, Cost: 183.9668, WD: 0.0499)
+Epoch: 16. Valid Loss: 130.2000 (ELBO: 130.1498, Cost: 189.6130, WD: 0.0502)
+Epoch: 16. New best validation loss: 130.2000. Saving model...
+Epoch: 16. 当前学习率: 2e-05
+Epoch: 17. Train Loss: 122.1576 (ELBO: 122.1071, Cost: 181.5719, WD: 0.0505)
+Epoch: 17. Valid Loss: 127.2084 (ELBO: 127.1576, Cost: 186.6023, WD: 0.0508)
+Epoch: 17. New best validation loss: 127.2084. Saving model...
+Epoch: 17. 当前学习率: 2e-05
+Epoch: 18. Train Loss: 119.3303 (ELBO: 119.2792, Cost: 178.7129, WD: 0.0511)
+Epoch: 18. Valid Loss: 123.7734 (ELBO: 123.7220, Cost: 183.1532, WD: 0.0514)
+Epoch: 18. New best validation loss: 123.7734. Saving model...
+Epoch: 18. 当前学习率: 2e-05
+Epoch: 19. Train Loss: 116.2874 (ELBO: 116.2356, Cost: 175.7962, WD: 0.0517)
+Epoch: 19. Valid Loss: 120.5675 (ELBO: 120.5154, Cost: 180.2839, WD: 0.0521)
+Epoch: 19. New best validation loss: 120.5675. Saving model...
+Epoch: 19. 当前学习率: 2e-05
+Epoch: 20. Train Loss: 113.3688 (ELBO: 113.3164, Cost: 173.4032, WD: 0.0524)
+Epoch: 20. Valid Loss: 117.4588 (ELBO: 117.4061, Cost: 177.8811, WD: 0.0527)
+Epoch: 20. New best validation loss: 117.4588. Saving model...
+Epoch: 20. 当前学习率: 2e-05
+Epoch: 21. Train Loss: 110.4556 (ELBO: 110.4026, Cost: 171.2483, WD: 0.0530)
+Epoch: 21. Valid Loss: 114.4050 (ELBO: 114.3517, Cost: 175.5668, WD: 0.0533)
+Epoch: 21. New best validation loss: 114.4050. Saving model...
+Epoch: 21. 当前学习率: 2e-05
+Epoch: 22. Train Loss: 108.0423 (ELBO: 107.9887, Cost: 169.4959, WD: 0.0536)
+Epoch: 22. Valid Loss: 111.9449 (ELBO: 111.8910, Cost: 173.6894, WD: 0.0539)
+Epoch: 22. New best validation loss: 111.9449. Saving model...
+Epoch: 22. 当前学习率: 2e-05
+Epoch: 23. Train Loss: 106.1525 (ELBO: 106.0983, Cost: 168.0910, WD: 0.0542)
+Epoch: 23. Valid Loss: 110.1748 (ELBO: 110.1202, Cost: 172.3147, WD: 0.0546)
+Epoch: 23. New best validation loss: 110.1748. Saving model...
+Epoch: 23. 当前学习率: 2e-05
+Epoch: 24. Train Loss: 104.6602 (ELBO: 104.6053, Cost: 166.9511, WD: 0.0549)
+Epoch: 24. Valid Loss: 108.5311 (ELBO: 108.4759, Cost: 170.9779, WD: 0.0552)
+Epoch: 24. New best validation loss: 108.5311. Saving model...
+Epoch: 24. 当前学习率: 2e-05
+Epoch: 25. Train Loss: 103.5623 (ELBO: 103.5068, Cost: 166.1253, WD: 0.0555)
+Epoch: 25. Valid Loss: 107.5432 (ELBO: 107.4873, Cost: 170.2436, WD: 0.0558)
+Epoch: 25. New best validation loss: 107.5432. Saving model...
+Epoch: 25. 当前学习率: 2e-05
+Epoch: 26. Train Loss: 102.8096 (ELBO: 102.7535, Cost: 165.6235, WD: 0.0561)
+Epoch: 26. Valid Loss: 106.7399 (ELBO: 106.6834, Cost: 169.6898, WD: 0.0565)
+Epoch: 26. New best validation loss: 106.7399. Saving model...
+Epoch: 26. 当前学习率: 2e-05
+Epoch: 27. Train Loss: 102.3622 (ELBO: 102.3054, Cost: 165.4329, WD: 0.0568)
+Epoch: 27. Valid Loss: 106.1870 (ELBO: 106.1298, Cost: 169.3942, WD: 0.0571)
+Epoch: 27. New best validation loss: 106.1870. Saving model...
+Epoch: 27. 当前学习率: 2e-05
+Epoch: 28. Train Loss: 102.1382 (ELBO: 102.0808, Cost: 165.4821, WD: 0.0574)
+Epoch: 28. Valid Loss: 105.9691 (ELBO: 105.9113, Cost: 169.4732, WD: 0.0578)
+Epoch: 28. New best validation loss: 105.9691. Saving model...
+Epoch: 28. 当前学习率: 2e-05
+Epoch: 29. Train Loss: 102.0259 (ELBO: 101.9678, Cost: 165.6765, WD: 0.0581)
+Epoch: 29. Valid Loss: 105.6959 (ELBO: 105.6374, Cost: 169.5141, WD: 0.0584)
+Epoch: 29. New best validation loss: 105.6959. Saving model...
+Epoch: 29. 当前学习率: 2e-05
+Epoch: 30. Train Loss: 102.0667 (ELBO: 102.0080, Cost: 166.0420, WD: 0.0587)
+Epoch: 30. Valid Loss: 105.6812 (ELBO: 105.6221, Cost: 169.8337, WD: 0.0591)
+Epoch: 30. New best validation loss: 105.6812. Saving model...
+Epoch: 30. 当前学习率: 2e-05
+Epoch: 31. Train Loss: 102.1890 (ELBO: 102.1296, Cost: 166.5052, WD: 0.0594)
+Epoch: 31. Valid Loss: 105.6065 (ELBO: 105.5468, Cost: 170.1065, WD: 0.0597)
+Epoch: 31. New best validation loss: 105.6065. Saving model...
+Epoch: 31. 当前学习率: 2e-05
+Epoch: 32. Train Loss: 102.3164 (ELBO: 102.2564, Cost: 166.9699, WD: 0.0601)
+Epoch: 32. Valid Loss: 105.6223 (ELBO: 105.5619, Cost: 170.4494, WD: 0.0604)
+Epoch: 32. 当前学习率: 2e-05
+Epoch: 33. Train Loss: 102.4810 (ELBO: 102.4203, Cost: 167.4635, WD: 0.0607)
+Epoch: 33. Valid Loss: 105.7941 (ELBO: 105.7330, Cost: 170.9476, WD: 0.0611)
+Epoch: 33. 当前学习率: 2e-05
+Epoch: 34. Train Loss: 102.5542 (ELBO: 102.4928, Cost: 167.8564, WD: 0.0614)
+Epoch: 34. Valid Loss: 105.7138 (ELBO: 105.6520, Cost: 171.1870, WD: 0.0617)
+Epoch: 34. 当前学习率: 2e-05
+使用标准 ELBO 损失 (Cost + KL)
+使用标准 ELBO 损失 (Cost + KL)
+使用标准 ELBO 损失 (Cost + KL)
+Epoch: 0. Train Loss: 255.8873 (ELBO: 255.8871, Cost: 278.3334, WD: 0.0002)
+Epoch: 0. Valid Loss: 246.7593 (ELBO: 246.7591, Cost: 269.5114, WD: 0.0002)
+Epoch: 0. New best validation loss: 246.7593. Saving model...
+Epoch: 0. 当前学习率: 0.0001
+Epoch: 1. Train Loss: 229.2992 (ELBO: 229.2989, Cost: 252.3969, WD: 0.0003)
+Epoch: 1. Valid Loss: 206.0513 (ELBO: 206.0510, Cost: 229.3734, WD: 0.0003)
+Epoch: 1. New best validation loss: 206.0513. Saving model...
+Epoch: 1. 当前学习率: 0.0001
+使用标准 ELBO 损失 (Cost + KL)
+使用标准 ELBO 损失 (Cost + KL)
+Epoch: 0. Train Loss: 255.3071 (ELBO: 255.3068, Cost: 277.9030, WD: 0.0003)
+Epoch: 0. Valid Loss: 246.0250 (ELBO: 246.0247, Cost: 268.8620, WD: 0.0003)
+Epoch: 0. New best validation loss: 246.0250. Saving model...
+Epoch: 0. 当前学习率: 0.0001
+Epoch: 1. Train Loss: 228.6449 (ELBO: 228.6445, Cost: 251.6503, WD: 0.0003)
+Epoch: 1. Valid Loss: 206.1706 (ELBO: 206.1702, Cost: 228.9023, WD: 0.0004)
+Epoch: 1. New best validation loss: 206.1706. Saving model...
+Epoch: 1. 当前学习率: 0.0001
+Epoch: 2. Train Loss: 181.7570 (ELBO: 181.7565, Cost: 205.1895, WD: 0.0005)
+Epoch: 2. Valid Loss: 167.6377 (ELBO: 167.6371, Cost: 191.9696, WD: 0.0006)
+Epoch: 2. New best validation loss: 167.6377. Saving model...
+Epoch: 2. 当前学习率: 0.0001
+Epoch: 3. Train Loss: 161.1518 (ELBO: 161.1511, Cost: 185.8750, WD: 0.0007)
+Epoch: 3. Valid Loss: 169.5315 (ELBO: 169.5307, Cost: 194.6684, WD: 0.0008)
+Epoch: 3. 当前学习率: 0.0001
+Epoch: 4. Train Loss: 171.8468 (ELBO: 171.8459, Cost: 197.2979, WD: 0.0010)
+Epoch: 4. Valid Loss: 190.3953 (ELBO: 190.3942, Cost: 216.1101, WD: 0.0012)
+Epoch: 4. 当前学习率: 0.0001
+Epoch: 5. Train Loss: 178.5271 (ELBO: 178.5257, Cost: 204.0439, WD: 0.0014)
+Epoch: 5. Valid Loss: 197.7481 (ELBO: 197.7465, Cost: 222.1007, WD: 0.0016)
+Epoch: 5. 当前学习率: 0.0001
+Epoch: 6. Train Loss: 191.0362 (ELBO: 191.0343, Cost: 213.2328, WD: 0.0018)
+Epoch: 6. Valid Loss: 187.5831 (ELBO: 187.5811, Cost: 211.5113, WD: 0.0021)
+Epoch: 6. 当前学习率: 2e-05
+Epoch: 7. Train Loss: 179.4676 (ELBO: 179.4655, Cost: 203.7386, WD: 0.0021)
+Epoch: 7. Valid Loss: 176.3605 (ELBO: 176.3583, Cost: 201.0705, WD: 0.0022)
+Epoch: 7. 当前学习率: 2e-05
+Epoch: 8. Train Loss: 166.1228 (ELBO: 166.1206, Cost: 191.2748, WD: 0.0023)
+Epoch: 8. Valid Loss: 163.2533 (ELBO: 163.2510, Cost: 188.8717, WD: 0.0023)
+Epoch: 8. New best validation loss: 163.2533. Saving model...
+Epoch: 8. 当前学习率: 2e-05
+Epoch: 9. Train Loss: 156.2836 (ELBO: 156.2812, Cost: 182.2915, WD: 0.0024)
+Epoch: 9. Valid Loss: 156.2537 (ELBO: 156.2512, Cost: 182.6543, WD: 0.0024)
+Epoch: 9. New best validation loss: 156.2537. Saving model...
+Epoch: 9. 当前学习率: 2e-05
+Epoch: 10. Train Loss: 151.6192 (ELBO: 151.6167, Cost: 178.3330, WD: 0.0025)
+Epoch: 10. Valid Loss: 153.2164 (ELBO: 153.2139, Cost: 180.2461, WD: 0.0026)
+Epoch: 10. New best validation loss: 153.2164. Saving model...
+Epoch: 10. 当前学习率: 2e-05
+Epoch: 11. Train Loss: 149.7356 (ELBO: 149.7330, Cost: 177.0177, WD: 0.0026)
+Epoch: 11. Valid Loss: 151.9227 (ELBO: 151.9201, Cost: 179.4611, WD: 0.0027)
+Epoch: 11. New best validation loss: 151.9227. Saving model...
+Epoch: 11. 当前学习率: 2e-05
+Epoch: 12. Train Loss: 149.0329 (ELBO: 149.0301, Cost: 176.7815, WD: 0.0027)
+Epoch: 12. Valid Loss: 151.4599 (ELBO: 151.4571, Cost: 179.4239, WD: 0.0028)
+Epoch: 12. New best validation loss: 151.4599. Saving model...
+Epoch: 12. 当前学习率: 2e-05
+Epoch: 13. Train Loss: 148.5451 (ELBO: 148.5422, Cost: 176.6856, WD: 0.0029)
+Epoch: 13. Valid Loss: 151.1155 (ELBO: 151.1126, Cost: 179.4386, WD: 0.0030)
+Epoch: 13. New best validation loss: 151.1155. Saving model...
+Epoch: 13. 当前学习率: 2e-05
+Epoch: 14. Train Loss: 147.7700 (ELBO: 147.7669, Cost: 176.2505, WD: 0.0030)
+Epoch: 14. Valid Loss: 150.0252 (ELBO: 150.0221, Cost: 178.6678, WD: 0.0031)
+Epoch: 14. New best validation loss: 150.0252. Saving model...
+Epoch: 14. 当前学习率: 2e-05
+Epoch: 15. Train Loss: 146.6952 (ELBO: 146.6921, Cost: 175.4751, WD: 0.0032)
+Epoch: 15. Valid Loss: 149.0657 (ELBO: 149.0625, Cost: 177.9964, WD: 0.0032)
+Epoch: 15. New best validation loss: 149.0657. Saving model...
+Epoch: 15. 当前学习率: 2e-05
+Epoch: 16. Train Loss: 145.4146 (ELBO: 145.4113, Cost: 174.4681, WD: 0.0033)
+Epoch: 16. Valid Loss: 147.9720 (ELBO: 147.9687, Cost: 177.1621, WD: 0.0034)
+Epoch: 16. New best validation loss: 147.9720. Saving model...
+Epoch: 16. 当前学习率: 2e-05
+Epoch: 17. Train Loss: 144.2550 (ELBO: 144.2516, Cost: 173.5603, WD: 0.0034)
+Epoch: 17. Valid Loss: 147.0447 (ELBO: 147.0412, Cost: 176.4790, WD: 0.0035)
+Epoch: 17. New best validation loss: 147.0447. Saving model...
+Epoch: 17. 当前学习率: 2e-05
+Epoch: 18. Train Loss: 143.2856 (ELBO: 143.2820, Cost: 172.8271, WD: 0.0036)
+Epoch: 18. Valid Loss: 146.3619 (ELBO: 146.3582, Cost: 176.0233, WD: 0.0037)
+Epoch: 18. New best validation loss: 146.3619. Saving model...
+Epoch: 18. 当前学习率: 2e-05
+Epoch: 19. Train Loss: 142.5223 (ELBO: 142.5185, Cost: 172.2881, WD: 0.0038)
+Epoch: 19. Valid Loss: 145.8077 (ELBO: 145.8039, Cost: 175.6907, WD: 0.0038)
+Epoch: 19. New best validation loss: 145.8077. Saving model...
+Epoch: 19. 当前学习率: 2e-05
+Epoch: 20. Train Loss: 141.7310 (ELBO: 141.7271, Cost: 171.7132, WD: 0.0039)
+Epoch: 20. Valid Loss: 145.2724 (ELBO: 145.2684, Cost: 175.3624, WD: 0.0040)
+Epoch: 20. New best validation loss: 145.2724. Saving model...
+Epoch: 20. 当前学习率: 2e-05
+Epoch: 21. Train Loss: 140.8654 (ELBO: 140.8613, Cost: 171.0569, WD: 0.0041)
+Epoch: 21. Valid Loss: 144.3770 (ELBO: 144.3729, Cost: 174.6754, WD: 0.0042)
+Epoch: 21. New best validation loss: 144.3770. Saving model...
+Epoch: 21. 当前学习率: 2e-05
+Epoch: 22. Train Loss: 139.7960 (ELBO: 139.7917, Cost: 170.1900, WD: 0.0042)
+Epoch: 22. Valid Loss: 143.1503 (ELBO: 143.1459, Cost: 173.6454, WD: 0.0043)
+Epoch: 22. New best validation loss: 143.1503. Saving model...
+Epoch: 22. 当前学习率: 2e-05
+Epoch: 23. Train Loss: 138.4286 (ELBO: 138.4242, Cost: 169.0213, WD: 0.0044)
+Epoch: 23. Valid Loss: 141.8639 (ELBO: 141.8594, Cost: 172.5623, WD: 0.0045)
+Epoch: 23. New best validation loss: 141.8639. Saving model...
+Epoch: 23. 当前学习率: 2e-05
+Epoch: 24. Train Loss: 136.9027 (ELBO: 136.8981, Cost: 167.6916, WD: 0.0046)
+Epoch: 24. Valid Loss: 140.4205 (ELBO: 140.4158, Cost: 171.3119, WD: 0.0047)
+Epoch: 24. New best validation loss: 140.4205. Saving model...
+Epoch: 24. 当前学习率: 2e-05
+Epoch: 25. Train Loss: 135.4679 (ELBO: 135.4632, Cost: 166.4495, WD: 0.0048)
+Epoch: 25. Valid Loss: 139.0008 (ELBO: 138.9960, Cost: 170.0809, WD: 0.0049)
+Epoch: 25. New best validation loss: 139.0008. Saving model...
+Epoch: 25. 当前学习率: 2e-05
+Epoch: 26. Train Loss: 134.2248 (ELBO: 134.2199, Cost: 165.3956, WD: 0.0049)
+Epoch: 26. Valid Loss: 137.8507 (ELBO: 137.8457, Cost: 169.1204, WD: 0.0050)
+Epoch: 26. New best validation loss: 137.8507. Saving model...
+Epoch: 26. 当前学习率: 2e-05
+Epoch: 27. Train Loss: 133.1624 (ELBO: 133.1572, Cost: 164.5211, WD: 0.0051)
+Epoch: 27. Valid Loss: 136.7644 (ELBO: 136.7591, Cost: 168.2180, WD: 0.0052)
+Epoch: 27. New best validation loss: 136.7644. Saving model...
+Epoch: 27. 当前学习率: 2e-05
+Epoch: 28. Train Loss: 132.3314 (ELBO: 132.3261, Cost: 163.8768, WD: 0.0053)
+Epoch: 28. Valid Loss: 136.1331 (ELBO: 136.1277, Cost: 167.7766, WD: 0.0054)
+Epoch: 28. New best validation loss: 136.1331. Saving model...
+Epoch: 28. 当前学习率: 2e-05
+Epoch: 29. Train Loss: 131.8168 (ELBO: 131.8113, Cost: 163.5494, WD: 0.0055)
+Epoch: 29. Valid Loss: 135.6723 (ELBO: 135.6667, Cost: 167.5020, WD: 0.0056)
+Epoch: 29. New best validation loss: 135.6723. Saving model...
+Epoch: 29. 当前学习率: 2e-05
+Epoch: 30. Train Loss: 131.4140 (ELBO: 131.4083, Cost: 163.3337, WD: 0.0057)
+Epoch: 30. Valid Loss: 135.0163 (ELBO: 135.0105, Cost: 167.0337, WD: 0.0058)
+Epoch: 30. New best validation loss: 135.0163. Saving model...
+Epoch: 30. 当前学习率: 2e-05
+Epoch: 31. Train Loss: 131.0760 (ELBO: 131.0701, Cost: 163.1849, WD: 0.0059)
+Epoch: 31. Valid Loss: 134.8175 (ELBO: 134.8115, Cost: 167.0206, WD: 0.0060)
+Epoch: 31. New best validation loss: 134.8175. Saving model...
+Epoch: 31. 当前学习率: 2e-05
+Epoch: 32. Train Loss: 130.7657 (ELBO: 130.7596, Cost: 163.0596, WD: 0.0061)
+Epoch: 32. Valid Loss: 134.4698 (ELBO: 134.4636, Cost: 166.8677, WD: 0.0062)
+Epoch: 32. New best validation loss: 134.4698. Saving model...
+Epoch: 32. 当前学习率: 2e-05
+Epoch: 33. Train Loss: 130.4191 (ELBO: 130.4128, Cost: 162.9025, WD: 0.0063)
+Epoch: 33. Valid Loss: 134.2113 (ELBO: 134.2049, Cost: 166.7922, WD: 0.0064)
+Epoch: 33. New best validation loss: 134.2113. Saving model...
+Epoch: 33. 当前学习率: 2e-05
+Epoch: 34. Train Loss: 130.0541 (ELBO: 130.0477, Cost: 162.7268, WD: 0.0065)
+Epoch: 34. Valid Loss: 133.9892 (ELBO: 133.9826, Cost: 166.7597, WD: 0.0066)
+Epoch: 34. New best validation loss: 133.9892. Saving model...
+Epoch: 34. 当前学习率: 2e-05
+使用标准 ELBO 损失 (Cost + KL)
+使用标准 ELBO 损失 (Cost + KL)
+Epoch: 0. Train Loss: 254.8411 (ELBO: 254.8408, Cost: 277.2797, WD: 0.0003)
+Epoch: 0. Valid Loss: 244.7179 (ELBO: 244.7176, Cost: 267.4574, WD: 0.0003)
+Epoch: 0. New best validation loss: 244.7179. Saving model...
+Epoch: 0. 当前学习率: 0.0001
+Epoch: 1. Train Loss: 226.8131 (ELBO: 226.8128, Cost: 249.8264, WD: 0.0003)
+Epoch: 1. Valid Loss: 203.8708 (ELBO: 203.8705, Cost: 226.9952, WD: 0.0003)
+Epoch: 1. New best validation loss: 203.8708. Saving model...
+Epoch: 1. 当前学习率: 0.0001
+Epoch: 2. Train Loss: 181.2534 (ELBO: 181.2530, Cost: 204.2318, WD: 0.0004)
+Epoch: 2. Valid Loss: 166.4358 (ELBO: 166.4353, Cost: 190.5912, WD: 0.0005)
+Epoch: 2. New best validation loss: 166.4358. Saving model...
+Epoch: 2. 当前学习率: 0.0001
+Epoch: 3. Train Loss: 157.6510 (ELBO: 157.6504, Cost: 182.2494, WD: 0.0006)
+Epoch: 3. Valid Loss: 165.7618 (ELBO: 165.7611, Cost: 190.7782, WD: 0.0007)
+Epoch: 3. New best validation loss: 165.7618. Saving model...
+Epoch: 3. 当前学习率: 0.0001
+Epoch: 4. Train Loss: 173.0722 (ELBO: 173.0713, Cost: 198.0178, WD: 0.0009)
+Epoch: 4. Valid Loss: 184.8448 (ELBO: 184.8437, Cost: 208.3495, WD: 0.0011)
+Epoch: 4. 当前学习率: 0.0001
+Epoch: 5. Train Loss: 183.8113 (ELBO: 183.8100, Cost: 208.2775, WD: 0.0013)
+Epoch: 5. Valid Loss: 200.8884 (ELBO: 200.8869, Cost: 226.8728, WD: 0.0015)
+Epoch: 5. 当前学习率: 0.0001
+使用标准 ELBO 损失 (Cost + KL)
+Epoch: 0. Train Loss: 255.4251 (ELBO: 255.4249, Cost: 277.4041, WD: 0.0002)
+Epoch: 0. Valid Loss: 245.1892 (ELBO: 245.1890, Cost: 267.2069, WD: 0.0002)
+Epoch: 0. New best validation loss: 245.1892. Saving model...
+Epoch: 0. 当前学习率: 0.0001
+Epoch: 1. Train Loss: 226.9304 (ELBO: 226.9302, Cost: 248.8753, WD: 0.0002)
+Epoch: 1. Valid Loss: 203.8682 (ELBO: 203.8681, Cost: 225.2492, WD: 0.0001)
+Epoch: 1. New best validation loss: 203.8682. Saving model...
+Epoch: 1. 当前学习率: 0.0001
+Epoch: 2. Train Loss: 179.4609 (ELBO: 179.4608, Cost: 200.9164, WD: 0.0001)
+Epoch: 2. Valid Loss: 164.0234 (ELBO: 164.0233, Cost: 186.1096, WD: 0.0001)
+Epoch: 2. New best validation loss: 164.0234. Saving model...
+Epoch: 2. 当前学习率: 0.0001
+Epoch: 3. Train Loss: 158.2867 (ELBO: 158.2866, Cost: 180.3691, WD: 0.0001)
+Epoch: 3. Valid Loss: 170.3247 (ELBO: 170.3246, Cost: 192.3085, WD: 0.0001)
+Epoch: 3. 当前学习率: 0.0001
+Epoch: 4. Train Loss: 175.3580 (ELBO: 175.3578, Cost: 196.1156, WD: 0.0001)
+Epoch: 4. Valid Loss: 198.8051 (ELBO: 198.8049, Cost: 218.0626, WD: 0.0002)
+Epoch: 4. 当前学习率: 0.0001
+Epoch: 5. Train Loss: 194.9007 (ELBO: 194.9005, Cost: 213.6131, WD: 0.0002)
+Epoch: 5. Valid Loss: 208.7641 (ELBO: 208.7639, Cost: 226.0668, WD: 0.0002)
+Epoch: 5. 当前学习率: 0.0001
+Epoch: 6. Train Loss: 202.6123 (ELBO: 202.6121, Cost: 222.4003, WD: 0.0002)
+Epoch: 6. Valid Loss: 197.8730 (ELBO: 197.8727, Cost: 219.2134, WD: 0.0003)
+Epoch: 6. 当前学习率: 2e-05
+Epoch: 7. Train Loss: 187.6428 (ELBO: 187.6425, Cost: 208.8446, WD: 0.0003)
+Epoch: 7. Valid Loss: 183.9348 (ELBO: 183.9345, Cost: 204.8652, WD: 0.0003)
+Epoch: 7. 当前学习率: 2e-05
+使用双重梯度流 (VAE Loss + BM Loss)
+Epoch: 0. Train VAE Loss: 254.5908 (ELBO: 254.5906, Cost: 276.7446, WD: 0.0002) | Train BM Loss: 0.1651
+Epoch: 0. Valid VAE Loss: 244.0879 (ELBO: 244.0877, Cost: 266.2087, WD: 0.0002) | Valid BM Loss: 0.1618
+Epoch: 0. New best validation VAE loss: 244.0879. Saving model...
+Epoch: 0. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 1. Train VAE Loss: 226.1280 (ELBO: 226.1277, Cost: 248.0610, WD: 0.0002) | Train BM Loss: 0.1570
+Epoch: 1. Valid VAE Loss: 203.7125 (ELBO: 203.7122, Cost: 225.4156, WD: 0.0002) | Valid BM Loss: 0.1478
+Epoch: 1. New best validation VAE loss: 203.7125. Saving model...
+Epoch: 1. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 2. Train VAE Loss: 179.6679 (ELBO: 179.6677, Cost: 201.4697, WD: 0.0002) | Train BM Loss: 0.1411
+Epoch: 2. Valid VAE Loss: 162.8882 (ELBO: 162.8880, Cost: 184.8799, WD: 0.0002) | Valid BM Loss: 0.1114
+Epoch: 2. New best validation VAE loss: 162.8882. Saving model...
+Epoch: 2. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 3. Train VAE Loss: 150.5340 (ELBO: 150.5338, Cost: 172.6498, WD: 0.0002) | Train BM Loss: 0.1456
+Epoch: 3. Valid VAE Loss: 147.7995 (ELBO: 147.7993, Cost: 170.0050, WD: 0.0002) | Valid BM Loss: 0.1567
+Epoch: 3. New best validation VAE loss: 147.7995. Saving model...
+Epoch: 3. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 4. Train VAE Loss: 140.9975 (ELBO: 140.9972, Cost: 163.1549, WD: 0.0002) | Train BM Loss: 0.1541
+Epoch: 4. Valid VAE Loss: 142.5226 (ELBO: 142.5224, Cost: 164.5847, WD: 0.0002) | Valid BM Loss: 0.1495
+Epoch: 4. New best validation VAE loss: 142.5226. Saving model...
+Epoch: 4. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 5. Train VAE Loss: 137.4433 (ELBO: 137.4431, Cost: 159.2809, WD: 0.0002) | Train BM Loss: 0.1349
+Epoch: 5. Valid VAE Loss: 140.5617 (ELBO: 140.5615, Cost: 162.1510, WD: 0.0002) | Valid BM Loss: 0.1395
+Epoch: 5. New best validation VAE loss: 140.5617. Saving model...
+Epoch: 5. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 6. Train VAE Loss: 135.8350 (ELBO: 135.8348, Cost: 157.3683, WD: 0.0002) | Train BM Loss: 0.1386
+Epoch: 6. Valid VAE Loss: 139.4801 (ELBO: 139.4799, Cost: 160.9517, WD: 0.0002) | Valid BM Loss: 0.1467
+Epoch: 6. New best validation VAE loss: 139.4801. Saving model...
+Epoch: 6. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 7. Train VAE Loss: 134.9262 (ELBO: 134.9259, Cost: 156.4365, WD: 0.0002) | Train BM Loss: 0.1423
+Epoch: 7. Valid VAE Loss: 138.7071 (ELBO: 138.7068, Cost: 160.1747, WD: 0.0002) | Valid BM Loss: 0.1446
+Epoch: 7. New best validation VAE loss: 138.7071. Saving model...
+Epoch: 7. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 8. Train VAE Loss: 134.3893 (ELBO: 134.3890, Cost: 155.8898, WD: 0.0002) | Train BM Loss: 0.1405
+Epoch: 8. Valid VAE Loss: 138.3538 (ELBO: 138.3536, Cost: 159.7986, WD: 0.0002) | Valid BM Loss: 0.1426
+Epoch: 8. New best validation VAE loss: 138.3538. Saving model...
+Epoch: 8. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 9. Train VAE Loss: 133.9644 (ELBO: 133.9641, Cost: 155.4543, WD: 0.0002) | Train BM Loss: 0.1393
+Epoch: 9. Valid VAE Loss: 137.9524 (ELBO: 137.9522, Cost: 159.3834, WD: 0.0002) | Valid BM Loss: 0.1368
+Epoch: 9. New best validation VAE loss: 137.9524. Saving model...
+Epoch: 9. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 10. Train VAE Loss: 133.6293 (ELBO: 133.6290, Cost: 155.1124, WD: 0.0002) | Train BM Loss: 0.1390
+Epoch: 10. Valid VAE Loss: 137.5914 (ELBO: 137.5912, Cost: 159.0192, WD: 0.0003) | Valid BM Loss: 0.1446
+Epoch: 10. New best validation VAE loss: 137.5914. Saving model...
+Epoch: 10. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 11. Train VAE Loss: 133.3808 (ELBO: 133.3805, Cost: 154.8531, WD: 0.0003) | Train BM Loss: 0.1399
+Epoch: 11. Valid VAE Loss: 137.4711 (ELBO: 137.4709, Cost: 158.8872, WD: 0.0003) | Valid BM Loss: 0.1396
+Epoch: 11. New best validation VAE loss: 137.4711. Saving model...
+Epoch: 11. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 12. Train VAE Loss: 133.2434 (ELBO: 133.2432, Cost: 154.7179, WD: 0.0003) | Train BM Loss: 0.1408
+Epoch: 12. Valid VAE Loss: 137.2148 (ELBO: 137.2145, Cost: 158.6067, WD: 0.0003) | Valid BM Loss: 0.1437
+Epoch: 12. New best validation VAE loss: 137.2148. Saving model...
+Epoch: 12. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 13. Train VAE Loss: 133.0468 (ELBO: 133.0466, Cost: 154.5100, WD: 0.0003) | Train BM Loss: 0.1431
+Epoch: 13. Valid VAE Loss: 137.0655 (ELBO: 137.0652, Cost: 158.4549, WD: 0.0003) | Valid BM Loss: 0.1461
+Epoch: 13. New best validation VAE loss: 137.0655. Saving model...
+Epoch: 13. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 14. Train VAE Loss: 132.9422 (ELBO: 132.9419, Cost: 154.3991, WD: 0.0003) | Train BM Loss: 0.1458
+Epoch: 14. Valid VAE Loss: 136.8611 (ELBO: 136.8609, Cost: 158.2534, WD: 0.0003) | Valid BM Loss: 0.1527
+Epoch: 14. New best validation VAE loss: 136.8611. Saving model...
+Epoch: 14. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 15. Train VAE Loss: 132.8204 (ELBO: 132.8201, Cost: 154.2799, WD: 0.0003) | Train BM Loss: 0.1486
+Epoch: 15. Valid VAE Loss: 136.7712 (ELBO: 136.7709, Cost: 158.1530, WD: 0.0003) | Valid BM Loss: 0.1540
+Epoch: 15. New best validation VAE loss: 136.7712. Saving model...
+Epoch: 15. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 16. Train VAE Loss: 132.6377 (ELBO: 132.6374, Cost: 154.0962, WD: 0.0003) | Train BM Loss: 0.1516
+Epoch: 16. Valid VAE Loss: 136.6703 (ELBO: 136.6701, Cost: 158.0655, WD: 0.0003) | Valid BM Loss: 0.1658
+Epoch: 16. New best validation VAE loss: 136.6703. Saving model...
+Epoch: 16. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 17. Train VAE Loss: 132.6499 (ELBO: 132.6497, Cost: 154.0973, WD: 0.0003) | Train BM Loss: 0.1559
+Epoch: 17. Valid VAE Loss: 136.7021 (ELBO: 136.7018, Cost: 158.0799, WD: 0.0003) | Valid BM Loss: 0.1650
+Epoch: 17. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 18. Train VAE Loss: 132.5269 (ELBO: 132.5266, Cost: 153.9725, WD: 0.0003) | Train BM Loss: 0.1592
+Epoch: 18. Valid VAE Loss: 136.6338 (ELBO: 136.6335, Cost: 158.0070, WD: 0.0003) | Valid BM Loss: 0.1642
+Epoch: 18. New best validation VAE loss: 136.6338. Saving model...
+Epoch: 18. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 19. Train VAE Loss: 132.4801 (ELBO: 132.4798, Cost: 153.9200, WD: 0.0003) | Train BM Loss: 0.1638
+Epoch: 19. Valid VAE Loss: 136.4787 (ELBO: 136.4785, Cost: 157.8423, WD: 0.0003) | Valid BM Loss: 0.1668
+Epoch: 19. New best validation VAE loss: 136.4787. Saving model...
+Epoch: 19. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 20. Train VAE Loss: 132.4270 (ELBO: 132.4267, Cost: 153.8643, WD: 0.0003) | Train BM Loss: 0.1683
+Epoch: 20. Valid VAE Loss: 136.4345 (ELBO: 136.4342, Cost: 157.7811, WD: 0.0003) | Valid BM Loss: 0.1734
+Epoch: 20. New best validation VAE loss: 136.4345. Saving model...
+Epoch: 20. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 21. Train VAE Loss: 132.3739 (ELBO: 132.3736, Cost: 153.8034, WD: 0.0003) | Train BM Loss: 0.1727
+Epoch: 21. Valid VAE Loss: 136.3665 (ELBO: 136.3662, Cost: 157.7204, WD: 0.0003) | Valid BM Loss: 0.1824
+Epoch: 21. New best validation VAE loss: 136.3665. Saving model...
+Epoch: 21. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 22. Train VAE Loss: 132.2598 (ELBO: 132.2596, Cost: 153.6764, WD: 0.0003) | Train BM Loss: 0.1778
+Epoch: 22. Valid VAE Loss: 136.3889 (ELBO: 136.3886, Cost: 157.7450, WD: 0.0003) | Valid BM Loss: 0.1931
+Epoch: 22. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 23. Train VAE Loss: 132.2692 (ELBO: 132.2689, Cost: 153.6757, WD: 0.0003) | Train BM Loss: 0.1840
+Epoch: 23. Valid VAE Loss: 136.3749 (ELBO: 136.3746, Cost: 157.6763, WD: 0.0003) | Valid BM Loss: 0.1866
+Epoch: 23. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 24. Train VAE Loss: 132.1653 (ELBO: 132.1650, Cost: 153.5605, WD: 0.0003) | Train BM Loss: 0.1876
+Epoch: 24. Valid VAE Loss: 136.1936 (ELBO: 136.1933, Cost: 157.5130, WD: 0.0003) | Valid BM Loss: 0.2128
+Epoch: 24. New best validation VAE loss: 136.1936. Saving model...
+Epoch: 24. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 25. Train VAE Loss: 132.1079 (ELBO: 132.1076, Cost: 153.4878, WD: 0.0003) | Train BM Loss: 0.1947
+Epoch: 25. Valid VAE Loss: 136.2700 (ELBO: 136.2697, Cost: 157.5693, WD: 0.0003) | Valid BM Loss: 0.2104
+Epoch: 25. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 26. Train VAE Loss: 132.0322 (ELBO: 132.0319, Cost: 153.3891, WD: 0.0003) | Train BM Loss: 0.2001
+Epoch: 26. Valid VAE Loss: 136.1735 (ELBO: 136.1732, Cost: 157.4307, WD: 0.0003) | Valid BM Loss: 0.2008
+Epoch: 26. New best validation VAE loss: 136.1735. Saving model...
+Epoch: 26. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 27. Train VAE Loss: 132.0175 (ELBO: 132.0172, Cost: 153.3569, WD: 0.0003) | Train BM Loss: 0.2049
+Epoch: 27. Valid VAE Loss: 135.8705 (ELBO: 135.8702, Cost: 157.1112, WD: 0.0003) | Valid BM Loss: 0.2152
+Epoch: 27. New best validation VAE loss: 135.8705. Saving model...
+Epoch: 27. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 28. Train VAE Loss: 131.9646 (ELBO: 131.9643, Cost: 153.2716, WD: 0.0003) | Train BM Loss: 0.2108
+Epoch: 28. Valid VAE Loss: 135.8872 (ELBO: 135.8869, Cost: 157.1104, WD: 0.0003) | Valid BM Loss: 0.2366
+Epoch: 28. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 29. Train VAE Loss: 131.9310 (ELBO: 131.9307, Cost: 153.2101, WD: 0.0003) | Train BM Loss: 0.2180
+Epoch: 29. Valid VAE Loss: 136.0806 (ELBO: 136.0803, Cost: 157.2523, WD: 0.0003) | Valid BM Loss: 0.2323
+Epoch: 29. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 30. Train VAE Loss: 131.8593 (ELBO: 131.8590, Cost: 153.0958, WD: 0.0003) | Train BM Loss: 0.2233
+Epoch: 30. Valid VAE Loss: 135.8452 (ELBO: 135.8448, Cost: 156.9460, WD: 0.0003) | Valid BM Loss: 0.2182
+Epoch: 30. New best validation VAE loss: 135.8452. Saving model...
+Epoch: 30. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 31. Train VAE Loss: 131.7671 (ELBO: 131.7667, Cost: 152.9642, WD: 0.0003) | Train BM Loss: 0.2289
+Epoch: 31. Valid VAE Loss: 135.7682 (ELBO: 135.7678, Cost: 156.8702, WD: 0.0003) | Valid BM Loss: 0.2529
+Epoch: 31. New best validation VAE loss: 135.7682. Saving model...
+Epoch: 31. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 32. Train VAE Loss: 131.7681 (ELBO: 131.7677, Cost: 152.9029, WD: 0.0003) | Train BM Loss: 0.2347
+Epoch: 32. Valid VAE Loss: 135.8431 (ELBO: 135.8427, Cost: 156.8621, WD: 0.0003) | Valid BM Loss: 0.2448
+Epoch: 32. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 33. Train VAE Loss: 131.5888 (ELBO: 131.5884, Cost: 152.6827, WD: 0.0003) | Train BM Loss: 0.2422
+Epoch: 33. Valid VAE Loss: 135.6307 (ELBO: 135.6303, Cost: 156.5776, WD: 0.0003) | Valid BM Loss: 0.2537
+Epoch: 33. New best validation VAE loss: 135.6307. Saving model...
+Epoch: 33. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+Epoch: 34. Train VAE Loss: 131.5482 (ELBO: 131.5478, Cost: 152.5673, WD: 0.0003) | Train BM Loss: 0.2469
+Epoch: 34. Valid VAE Loss: 135.5503 (ELBO: 135.5500, Cost: 156.4425, WD: 0.0004) | Valid BM Loss: 0.2667
+Epoch: 34. New best validation VAE loss: 135.5503. Saving model...
+Epoch: 34. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+使用双重梯度流 (VAE Loss + BM Loss)
