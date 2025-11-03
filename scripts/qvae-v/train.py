@@ -4,6 +4,7 @@ import pickle
 from tqdm import tqdm
 from matplotlib import pyplot as plt #  导入 matplotlib
 import matplotlib as mpl
+import seaborn as sns
 import torch.nn as nn
 import torch.optim as optim
 from torch.nn import functional as F
@@ -44,11 +45,11 @@ logging.info(f"使用设备: {device}")
 
 # --- 关键超参数 ---
 INPUT_DIM = 1540  # 70 * 22 (保持不变，因为 CNN 在模块内部处理)
-LATENT_DIM = 32   # 32 维隐空间
+LATENT_DIM = 64   # 32 维隐空间
 BATCH_SIZE = 2048 # 增加 Batch Size
 LEARNING_RATE_VAE = 1e-4 # 编码器/解码器的学习率
-LEARNING_RATE_BM = 1e-6  # BM 先验的学习率 
-EPOCHS = 35
+LEARNING_RATE_BM = 1e-6  # BM 先验的学习率 (进一步调低)
+EPOCHS = 50
 NUM_WORKERS = 4   # 数据加载器的工作进程
 MAX_LEN = 70      # 序列最大长度
 CHANNELS = 22     # 20 个氨基酸 + '$' + '0'
@@ -122,41 +123,6 @@ def get_mean_x(dataset, batch_size, num_workers):
     mean_x = total_sum / total_count
     logging.info(f"Calculated train_bias (mean_x): {mean_x}")
     return mean_x
-
-# --- 3. 实例化数据集和加载器 ---
-train_dataset = SequenceDataset(pkl_file_path='data/tv_sim_split_train.pkl', max_len=MAX_LEN)
-valid_dataset = SequenceDataset(pkl_file_path='data/tv_sim_split_valid.pkl', max_len=MAX_LEN)
-
-# 计算 mean_x
-mean_x = get_mean_x(train_dataset, BATCH_SIZE, NUM_WORKERS)
-
-# --- 将 mean_x 保存到文件 ---
-mean_x_save_path = os.path.join(model_save_dir, f"mean_x_bs{BATCH_SIZE}.pkl")
-try:
-    with open(mean_x_save_path, 'wb') as f:
-        pickle.dump(mean_x, f)
-    logging.info(f"已将 mean_x 保存到: {mean_x_save_path}")
-except Exception as e:
-    logging.error(f"保存 mean_x 失败: {e}")
-# --- 结束修正 ---
-
-logging.info(f"训练集大小: {len(train_dataset)}")
-logging.info(f"验证集大小: {len(valid_dataset)}")
-
-train_loader = DataLoader(
-    dataset=train_dataset,
-    batch_size=BATCH_SIZE,
-    shuffle=True,
-    num_workers=NUM_WORKERS,
-    pin_memory=True # 如果在 GPU 上训练，开启 pin_memory
-)
-valid_loader = DataLoader(
-    dataset=valid_dataset,
-    batch_size=BATCH_SIZE,
-    shuffle=False,
-    num_workers=NUM_WORKERS,
-    pin_memory=True
-)
 
 
 # --- 4. 定义 QVAE 模型组件   ---
@@ -237,256 +203,21 @@ class Decoder(nn.Module):
         # 4. Flatten to match output_dim
         return h.view(-1, self.channels * self.seq_len) # (B, 1540)
 
-# --- 5. 实例化模型和优化器 ---
 
-# 1. 实例化所有组件 (使用新的 CNN Encoder/Decoder)
-encoder = Encoder(INPUT_DIM, LATENT_DIM).to(device)
-decoder = Decoder(LATENT_DIM, INPUT_DIM).to(device)
-
-# 2.  实例化玻尔兹曼机先验 (RBM)
-bm_prior = RestrictedBoltzmannMachine(
-    num_visible=prior_vis, # 16
-    num_hidden=prior_hid   # 16
-).to(device)
-logging.info(f"已初始化 RestrictedBoltzmannMachine 先验，总共 {bm_prior.num_nodes} 个节点 ({bm_prior.num_visible} 可见 + {bm_prior.num_hidden} 隐藏)。")
-
-
-logging.info("配置强探索采样器 (SimulatedAnnealingOptimizer)...")
-sampler = SimulatedAnnealingOptimizer(
-    initial_temperature=500.0,
-    alpha=0.999,                  # 缓慢降温
-    cutoff_temperature=0.001,
-    iterations_per_t=200,
-    size_limit=100,
-    process_num=-1
-)
-# 4. 实例化 QVAE 主模型
-model = QVAE(
-    encoder=encoder,
-    decoder=decoder,
-    bm=bm_prior,
-    sampler=sampler,
-    dist_beta=1.0,
-    mean_x=mean_x, #   传递计算好的 mean_x
-    num_vis=bm_prior.num_visible
-).to(device)
-
-# 4.5. 配置两个独立的优化器
-vae_params = itertools.chain(model.encoder.parameters(), model.decoder.parameters())
-bm_params = model.bm.parameters()
-
-logging.info(f"配置 VAE 优化器 (Encoder/Decoder), 学习率: {LEARNING_RATE_VAE}")
-optimizer_vae = optim.Adam(vae_params, lr=LEARNING_RATE_VAE)
-
-logging.info(f"配置 BM 优化器 (Prior), 学习率: {LEARNING_RATE_BM}")
-optimizer_bm = optim.Adam(bm_params, lr=LEARNING_RATE_BM)
-
-logging.info(f"配置 VAE 学习率调度器 (ReduceLROnPlateau)...")
-# 调度器现在监控 VAE 优化器
-scheduler = lr_scheduler.ReduceLROnPlateau(
-    optimizer_vae,
-    mode='min',         # 监控 'min' (验证损失)
-    factor=0.2,         # 学习率衰减为原来的 0.2 倍
-    patience=3,         # 3 个 epochs 验证损失没有改善
-    min_lr=1e-6
-)
-
-# --- 6. 训练循环  ---
-logging.info(f"--- 开始训练: {EPOCHS} 个 Epochs, Batch Size: {BATCH_SIZE} ---")
-best_valid_loss = float('inf') # 跟踪最佳验证损失
-
-#  初始化用于绘图的历史列表
-train_history_elbo = []
-valid_history_elbo = []
-train_history_cost = []
-valid_history_cost = []
-train_history_bm_loss = [] # 跟踪 BM 损失
-
-
-with open(log_file_path, 'a') as f: # 'a' = 附加模式
-    f.write(f"使用双重梯度流 (VAE Loss + BM Loss)\n")
-
-    for epoch in range(EPOCHS):
-
-
-        # --- 训练 ---
-        model.train()
-
-        # 初始化损失跟踪器
-        train_loss_total = 0.0
-        train_loss_elbo = 0.0
-        train_loss_wd = 0.0
-        train_loss_cost = 0.0 #  跟踪原始重构损失
-        train_loss_bm = 0.0 #  跟踪 BM 损失
-
-        for batch_X in tqdm(train_loader, desc=f"Epoch {epoch+1}/{EPOCHS} [Train]"):
-
-            batch_X = batch_X.to(device)
-
-            # --- 修正: 双重梯度流 ---
-            optimizer_vae.zero_grad()
-            optimizer_bm.zero_grad()
-
-            # 2. 前向传播 (VAE 损失)
-            (output, recon_x, neg_elbo, wd_loss,
-             total_kl, cost, q, posterior, zeta) = model.neg_elbo(batch_X, kl_beta=1.0)
-
-            # 3. 计算 VAE 损失 (目标 1)
-
-            vae_loss = neg_elbo + wd_loss
-
-            # 4. 计算 VAE 梯度
-            #    retain_graph=True 是必须的，因为 bm_loss 还需要使用计算图
-            vae_loss.backward(retain_graph=True)
-
-            # 5. 计算 BM 损失 (目标 2)
-            #    Loss_BM = E_q[E(z)] - E_p[E(z)]
-            bm_loss = model.get_bm_loss(posterior, zeta)
-
-            # 6. 计算 BM 梯度
-            bm_loss.backward()
-
-            # 7. 更新 VAE 和 BM 的权重
-            optimizer_vae.step()
-            optimizer_bm.step()
-            # --- 结束修正 ---
-
-            # 累加损失
-            train_loss_total += vae_loss.item() # 总损失现在是 VAE 损失
-            train_loss_elbo += neg_elbo.item()
-            train_loss_wd += wd_loss.item()
-            train_loss_cost += cost.item()
-            train_loss_bm += bm_loss.item() # 累加 BM 损失
-
-        # 计算平均损失
-        avg_train_total = train_loss_total / len(train_loader)
-        avg_train_elbo = train_loss_elbo / len(train_loader)
-        avg_train_wd = train_loss_wd / len(train_loader)
-        avg_train_cost = train_loss_cost / len(train_loader)
-        avg_train_bm_loss = train_loss_bm / len(train_loader) # 计算平均 BM 损失
-
-        #  存储历史
-        train_history_elbo.append(avg_train_elbo)
-        train_history_cost.append(avg_train_cost)
-        train_history_bm_loss.append(avg_train_bm_loss)
-
-        # --- 修正: 更新日志以包含 BM Loss ---
-        log_msg_train = (
-            f"Epoch: {epoch}. Train VAE Loss: {avg_train_total:.4f} "
-            f"(ELBO: {avg_train_elbo:.4f}, Cost: {avg_train_cost:.4f}, WD: {avg_train_wd:.4f}) | "
-            f"Train BM Loss: {avg_train_bm_loss:.4f}"
-        )
-        # --- 结束修正 ---
-
-        f.write(log_msg_train + "\n")
-        logging.info(log_msg_train)
-
-        # 移除在每个 epoch 都保存模型的代码
-
-        # --- 验证 ---
-        model.eval()
-        with torch.no_grad():
-            #  初始化所有损失跟踪器
-            valid_loss_total = 0.0
-            valid_loss_elbo = 0.0
-            valid_loss_wd = 0.0
-            valid_loss_cost = 0.0 #  跟踪原始重构损失
-            valid_loss_bm = 0.0 #  跟踪 BM 损失
-
-            for batchv_X in tqdm(valid_loader, desc=f"Epoch {epoch+1}/{EPOCHS} [Valid]"):
-
-                batchv_X = batchv_X.to(device)
-
-                (v_output, v_recon_x, v_neg_elbo, v_wd_loss,
-                 v_total_kl, v_cost, v_q, v_posterior, v_zeta) = model.neg_elbo(batchv_X, kl_beta=1.0)
-
-                # 计算验证集上的 BM 损失
-                v_bm_loss = model.get_bm_loss(v_posterior, v_zeta)
-
-                #  累加所有损失
-                valid_loss_total += (v_neg_elbo + v_wd_loss).item()
-                valid_loss_elbo += v_neg_elbo.item() # 跟踪 ELBO
-                valid_loss_wd += v_wd_loss.item()
-                valid_loss_cost += v_cost.item()
-                valid_loss_bm += v_bm_loss.item()
-
-            # 计算平均验证损失
-            avg_valid_total = valid_loss_total / len(valid_loader) # VAE Loss
-            avg_valid_elbo = valid_loss_elbo / len(valid_loader)
-            avg_valid_wd = valid_loss_wd / len(valid_loader)
-            avg_valid_cost = valid_loss_cost / len(valid_loader)
-            avg_valid_bm_loss = valid_loss_bm / len(valid_loader)
-
-            #  存储历史
-            valid_history_elbo.append(avg_valid_elbo)
-            valid_history_cost.append(avg_valid_cost)
-
-            log_msg_valid = (
-                f"Epoch: {epoch}. Valid VAE Loss: {avg_valid_total:.4f} "
-                f"(ELBO: {avg_valid_elbo:.4f}, Cost: {avg_valid_cost:.4f}, WD: {avg_valid_wd:.4f}) | "
-                f"Valid BM Loss: {avg_valid_bm_loss:.4f}"
-            )
-
-            f.write(log_msg_valid + "\n")
-            logging.info(log_msg_valid)
-
-            # 仅在验证 VAE 损失改善时保存最佳模型
-            if avg_valid_total < best_valid_loss:
-                best_valid_loss = avg_valid_total
-                log_msg_save = f"Epoch: {epoch}. New best validation VAE loss: {best_valid_loss:.4f}. Saving model..."
-                logging.info(log_msg_save)
-                f.write(log_msg_save + "\n")
-
-                model_save_path = os.path.join(model_save_dir, f"qvae_cnn_best_model_bs{BATCH_SIZE}.chkpt")
-                torch.save(model.state_dict(), model_save_path)
-
-            # --- 更新学习率调度器 ---
-            scheduler.step(avg_valid_total) # 监控 VAE 损失
-            current_lr_vae = optimizer_vae.param_groups[0]['lr']
-            current_lr_bm = optimizer_bm.param_groups[0]['lr']
-
-            log_msg_lr = f"Epoch: {epoch}. 当前学习率 (VAE): {current_lr_vae}, (BM): {current_lr_bm}"
-            logging.info(log_msg_lr)
-            f.write(log_msg_lr + "\n")
-
-            # --- 新增: 打印 RBM 参数统计信息 ---
-            try:
-                with torch.no_grad():
-                    q_coef = model.bm.quadratic_coef.detach().cpu().numpy()
-                    l_bias = model.bm.linear_bias.detach().cpu().numpy()
-                    q_stats = f"BM W (二次项): Mean={q_coef.mean():.4f}, Std={q_coef.std():.4f}, Min={q_coef.min():.4f}, Max={q_coef.max():.4f}"
-                    l_stats = f"BM h (一次项): Mean={l_bias.mean():.4f}, Std={l_bias.std():.4f}, Min={l_bias.min():.4f}, Max={l_bias.max():.4f}"
-                    logging.info(q_stats)
-                    logging.info(l_stats)
-                    f.write(q_stats + "\n")
-                    f.write(l_stats + "\n")
-            except Exception as e:
-                logging.error(f"无法获取 RBM 参数统计信息: {e}")
-            # --- 结束新增 ---
-
-
-logging.info("--- QVAE 训练和评估结束 ---")
-
-# --- 7.  绘制损失曲线 ---
+# --- 7.  绘图函数 ---
 def plot_losses(train_elbo, valid_elbo, train_cost, valid_cost, train_bm, save_dir):
     """绘制 ELBO、Cost 和 BM 损失曲线并保存"""
     try:
-        
-        try:
-            plt.rcParams['font.sans-serif'] = ['SimHei'] # 指定默认字体为黑体
-        except:
-            logging.warning("无法设置 'SimHei' 字体，绘图可能无法显示中文。请尝试安装中文字体。")
-        plt.rcParams['axes.unicode_minus'] = False # 解决保存图像时负号 '-' 显示为方块的问题
-
+        # 移除了中文字体设置
         logging.info("正在生成损失曲线图...")
         epochs_range = range(1, len(train_elbo) + 1)
 
         fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10, 18))
-        fig.suptitle('QVAE Training Loss Curves', fontsize=16) # 改为英文标题
+        fig.suptitle('QVAE Training Loss Curves', fontsize=16) # 英文标题
 
         # 子图 1: 标准 ELBO 损失
-        ax1.plot(epochs_range, train_elbo, 'b-', label='Train ELBO') # 改为英文标签
-        ax1.plot(epochs_range, valid_elbo, 'r-', label='Valid ELBO') # 改为英文标签
+        ax1.plot(epochs_range, train_elbo, 'b-', label='Train ELBO') # 英文标签
+        ax1.plot(epochs_range, valid_elbo, 'r-', label='Valid ELBO') # 英文标签
         ax1.set_title(f'ELBO Loss (Cost + KL_lite)')
         ax1.set_xlabel('Epochs')
         ax1.set_ylabel('Loss')
@@ -494,8 +225,8 @@ def plot_losses(train_elbo, valid_elbo, train_cost, valid_cost, train_bm, save_d
         ax1.grid(True)
 
         # 子图 2: 重构损失 (Cost)
-        ax2.plot(epochs_range, train_cost, 'b-', label='Train Reconstruction Loss (Cost)') # 改为英文标签
-        ax2.plot(epochs_range, valid_cost, 'r-', label='Valid Reconstruction Loss (Cost)') # 改为英文标签
+        ax2.plot(epochs_range, train_cost, 'b-', label='Train Reconstruction Loss (Cost)') # 英文标签
+        ax2.plot(epochs_range, valid_cost, 'r-', label='Valid Reconstruction Loss (Cost)') # 英文标签
         ax2.set_title('Reconstruction Loss (Cost)')
         ax2.set_xlabel('Epochs')
         ax2.set_ylabel('Loss')
@@ -503,7 +234,7 @@ def plot_losses(train_elbo, valid_elbo, train_cost, valid_cost, train_bm, save_d
         ax2.grid(True)
 
         # 子图 3: BM 对比散度 (CD) 损失
-        ax3.plot(epochs_range, train_bm, 'g-', label='Train BM CD Loss') # 改为英文标签
+        ax3.plot(epochs_range, train_bm, 'g-', label='Train BM CD Loss') # 英文标签
         ax3.set_title('BM Contrastive Divergence Loss (E_q[E] - E_p[E])')
         ax3.set_xlabel('Epochs')
         ax3.set_ylabel('Loss')
@@ -521,13 +252,264 @@ def plot_losses(train_elbo, valid_elbo, train_cost, valid_cost, train_bm, save_d
     except Exception as e:
         logging.error(f"绘制损失曲线时发生错误: {e}")
 
-# 调用绘图函数
-plot_losses(
-    train_history_elbo,
-    valid_history_elbo,
-    train_history_cost,
-    valid_history_cost,
-    train_history_bm_loss, # 传递 BM 损失历史
-    log_save_dir
-)
+def plot_rbm_weights(weights_matrix, save_dir, epoch):
+    """绘制 RBM 权重矩阵的热力图并保存"""
+    try:
+        logging.info(f"正在生成 Epoch {epoch} 的 RBM 权重热力图...")
+        plt.figure(figsize=(10, 10))
+        sns.heatmap(weights_matrix, cmap='viridis', square=True, annot=False) # annot=False 避免显示数值
+        plt.title(f'RBM Weight Matrix (W) - Epoch {epoch}') # 英文标题
+        plt.xlabel('Nodes') # 英文标签
+        plt.ylabel('Nodes') # 英文标签
 
+        save_path = os.path.join(save_dir, f"rbm_weights_heatmap_epoch_{epoch}_bs{BATCH_SIZE}.png")
+        plt.savefig(save_path)
+        plt.close() # 关闭图像
+        logging.info(f"RBM 权重热力图已保存至: {save_path}")
+    except Exception as e:
+        logging.error(f"绘制 RBM 权重热力图时发生错误: {e}")
+
+
+def main():
+    # --- 3. 实例化数据集和加载器 ---
+    train_dataset = SequenceDataset(pkl_file_path='data/tv_sim_split_train.pkl', max_len=MAX_LEN)
+    valid_dataset = SequenceDataset(pkl_file_path='data/tv_sim_split_valid.pkl', max_len=MAX_LEN)
+
+    # 计算 mean_x
+    mean_x = get_mean_x(train_dataset, BATCH_SIZE, NUM_WORKERS)
+
+    # --- 将 mean_x 保存到文件 ---
+    mean_x_save_path = os.path.join(model_save_dir, f"mean_x_bs{BATCH_SIZE}.pkl")
+    try:
+        with open(mean_x_save_path, 'wb') as f:
+            pickle.dump(mean_x, f)
+        logging.info(f"已将 mean_x 保存到: {mean_x_save_path}")
+    except Exception as e:
+        logging.error(f"保存 mean_x 失败: {e}")
+
+    logging.info(f"训练集大小: {len(train_dataset)}")
+    logging.info(f"验证集大小: {len(valid_dataset)}")
+
+    train_loader = DataLoader(
+        dataset=train_dataset,
+        batch_size=BATCH_SIZE,
+        shuffle=True,
+        num_workers=NUM_WORKERS,
+        pin_memory=True # 如果在 GPU 上训练，开启 pin_memory
+    )
+    valid_loader = DataLoader(
+        dataset=valid_dataset,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
+        num_workers=NUM_WORKERS,
+        pin_memory=True
+    )
+
+    # --- 5. 实例化模型和优化器 ---
+    encoder = Encoder(INPUT_DIM, LATENT_DIM).to(device)
+    decoder = Decoder(LATENT_DIM, INPUT_DIM).to(device)
+    bm_prior = RestrictedBoltzmannMachine(
+        num_visible=prior_vis, # 16
+        num_hidden=prior_hid   # 16
+    ).to(device)
+    logging.info(f"已初始化 RestrictedBoltzmannMachine 先验，总共 {bm_prior.num_nodes} 个节点 ({bm_prior.num_visible} 可见 + {bm_prior.num_hidden} 隐藏)。")
+
+    logging.info("配置强探索采样器 (SimulatedAnnealingOptimizer)...")
+    sampler = SimulatedAnnealingOptimizer(
+        initial_temperature=1000.0,
+        alpha=0.99,
+        cutoff_temperature=0.001,
+        iterations_per_t=200,
+        size_limit=100,
+        process_num=-1
+    )
+    model = QVAE(
+        encoder=encoder,
+        decoder=decoder,
+        bm=bm_prior,
+        sampler=sampler,
+        dist_beta=1.0,
+        mean_x=mean_x,
+        num_vis=bm_prior.num_visible
+    ).to(device)
+
+    vae_params = itertools.chain(model.encoder.parameters(), model.decoder.parameters())
+    bm_params = model.bm.parameters()
+
+    logging.info(f"配置 VAE 优化器 (Encoder/Decoder), 学习率: {LEARNING_RATE_VAE}")
+    optimizer_vae = optim.Adam(vae_params, lr=LEARNING_RATE_VAE)
+
+    logging.info(f"配置 BM 优化器 (Prior), 学习率: {LEARNING_RATE_BM}")
+    optimizer_bm = optim.Adam(bm_params, lr=LEARNING_RATE_BM)
+
+    logging.info(f"配置 VAE 学习率调度器 (ReduceLROnPlateau)...")
+    scheduler = lr_scheduler.ReduceLROnPlateau(
+        optimizer_vae,
+        mode='min',
+        factor=0.2,
+        patience=3,
+        min_lr=1e-6
+    )
+
+    # --- 6. 训练循环  ---
+    logging.info(f"--- 开始训练: {EPOCHS} 个 Epochs, Batch Size: {BATCH_SIZE} ---")
+    best_valid_loss = float('inf')
+
+    train_history_elbo = []
+    valid_history_elbo = []
+    train_history_cost = []
+    valid_history_cost = []
+    train_history_bm_loss = []
+
+    try: 
+        with open(log_file_path, 'w') as f: # 改回 'w' (写入模式) 以开始新的日志
+            f.write(f"使用双重梯度流 (VAE Loss + BM Loss)\n")
+            f.write(f"VAE LR: {LEARNING_RATE_VAE}, BM LR: {LEARNING_RATE_BM}\n") # 记录学习率
+
+            for epoch in range(EPOCHS):
+
+                # --- 训练 ---
+                model.train()
+                train_loss_total = 0.0
+                train_loss_elbo = 0.0
+                train_loss_wd = 0.0
+                train_loss_cost = 0.0
+                train_loss_bm = 0.0
+
+                for batch_X in tqdm(train_loader, desc=f"Epoch {epoch+1}/{EPOCHS} [Train]"):
+                    batch_X = batch_X.to(device)
+
+                    optimizer_vae.zero_grad()
+                    optimizer_bm.zero_grad()
+
+                    (output, recon_x, neg_elbo, wd_loss,
+                     total_kl, cost, q, posterior, zeta) = model.neg_elbo(batch_X, kl_beta=1.0)
+
+                    vae_loss = neg_elbo + wd_loss
+                    vae_loss.backward(retain_graph=True) 
+
+                    bm_loss = model.get_bm_loss(posterior, zeta)
+                    bm_loss.backward()
+
+                    optimizer_vae.step()
+                    optimizer_bm.step()
+
+                    train_loss_total += vae_loss.item()
+                    train_loss_elbo += neg_elbo.item()
+                    train_loss_wd += wd_loss.item()
+                    train_loss_cost += cost.item()
+                    train_loss_bm += bm_loss.item()
+
+                avg_train_total = train_loss_total / len(train_loader)
+                avg_train_elbo = train_loss_elbo / len(train_loader)
+                avg_train_wd = train_loss_wd / len(train_loader)
+                avg_train_cost = train_loss_cost / len(train_loader)
+                avg_train_bm_loss = train_loss_bm / len(train_loader)
+
+                train_history_elbo.append(avg_train_elbo)
+                train_history_cost.append(avg_train_cost)
+                train_history_bm_loss.append(avg_train_bm_loss)
+
+                log_msg_train = (
+                    f"Epoch: {epoch}. Train VAE Loss: {avg_train_total:.4f} "
+                    f"(ELBO: {avg_train_elbo:.4f}, Cost: {avg_train_cost:.4f}, WD: {avg_train_wd:.4f}) | "
+                    f"Train BM Loss: {avg_train_bm_loss:.4f}"
+                )
+                f.write(log_msg_train + "\n")
+                logging.info(log_msg_train)
+
+                # --- 验证 ---
+                model.eval()
+                with torch.no_grad():
+                    valid_loss_total = 0.0
+                    valid_loss_elbo = 0.0
+                    valid_loss_wd = 0.0
+                    valid_loss_cost = 0.0
+                    valid_loss_bm = 0.0
+
+                    for batchv_X in tqdm(valid_loader, desc=f"Epoch {epoch+1}/{EPOCHS} [Valid]"):
+                        batchv_X = batchv_X.to(device)
+                        (v_output, v_recon_x, v_neg_elbo, v_wd_loss,
+                         v_total_kl, v_cost, v_q, v_posterior, v_zeta) = model.neg_elbo(batchv_X, kl_beta=1.0)
+                        v_bm_loss = model.get_bm_loss(v_posterior, v_zeta)
+
+                        valid_loss_total += (v_neg_elbo + v_wd_loss).item()
+                        valid_loss_elbo += v_neg_elbo.item()
+                        valid_loss_wd += v_wd_loss.item()
+                        valid_loss_cost += v_cost.item()
+                        valid_loss_bm += v_bm_loss.item()
+
+                    avg_valid_total = valid_loss_total / len(valid_loader)
+                    avg_valid_elbo = valid_loss_elbo / len(valid_loader)
+                    avg_valid_wd = valid_loss_wd / len(valid_loader)
+                    avg_valid_cost = valid_loss_cost / len(valid_loader)
+                    avg_valid_bm_loss = valid_loss_bm / len(valid_loader)
+
+                    valid_history_elbo.append(avg_valid_elbo)
+                    valid_history_cost.append(avg_valid_cost)
+
+                    log_msg_valid = (
+                        f"Epoch: {epoch}. Valid VAE Loss: {avg_valid_total:.4f} "
+                        f"(ELBO: {avg_valid_elbo:.4f}, Cost: {avg_valid_cost:.4f}, WD: {avg_valid_wd:.4f}) | "
+                        f"Valid BM Loss: {avg_valid_bm_loss:.4f}"
+                    )
+                    f.write(log_msg_valid + "\n")
+                    logging.info(log_msg_valid)
+
+                    if avg_valid_total < best_valid_loss:
+                        best_valid_loss = avg_valid_total
+                        torch.save(model.state_dict(), os.path.join(model_save_dir, f"qvae_cnn_best_model_bs{BATCH_SIZE}.chkpt"))
+                        logging.info(f"Epoch: {epoch}. New best validation VAE loss: {best_valid_loss:.4f}. Saving model...")
+
+                    current_lr_vae = optimizer_vae.param_groups[0]['lr']
+                    current_lr_bm = optimizer_bm.param_groups[0]['lr']
+                    log_msg_lr = f"Epoch: {epoch}. 当前学习率 (VAE): {current_lr_vae}, (BM): {current_lr_bm}"
+                    f.write(log_msg_lr + "\n")
+                    logging.info(log_msg_lr)
+
+                    try:
+                        with torch.no_grad():
+                            q_coef = model.bm.quadratic_coef.detach().cpu().numpy()
+                            l_bias = model.bm.linear_bias.detach().cpu().numpy()
+                            q_stats = f"BM W (二次项): Mean={q_coef.mean():.4f}, Std={q_coef.std():.4f}, Min={q_coef.min():.4f}, Max={q_coef.max():.4f}"
+                            l_stats = f"BM h (一次项): Mean={l_bias.mean():.4f}, Std={l_bias.std():.4f}, Min={l_bias.min():.4f}, Max={l_bias.max():.4f}"
+                            logging.info(q_stats)
+                            logging.info(l_stats)
+                            f.write(q_stats + "\n")
+                            f.write(l_stats + "\n")
+                    except Exception as e:
+                        logging.error(f"无法获取 RBM 参数统计信息: {e}")
+                    
+                scheduler.step(avg_valid_elbo)
+
+    except KeyboardInterrupt:
+        logging.warning("--- 训练被用户中断 (KeyboardInterrupt) ---")
+    finally:
+        # --- 训练循环结束 ---
+        logging.info("--- QVAE 训练和评估结束 ---")
+
+        # --- 7. 绘制损失曲线 ---
+        if train_history_elbo: # 确保至少有一个 epoch 的数据
+            plot_losses(
+                train_history_elbo,
+                valid_history_elbo,
+                train_history_cost,
+                valid_history_cost,
+                train_history_bm_loss,
+                log_save_dir
+            )
+        else:
+            logging.info("没有足够的训练数据来绘制损失曲线。")
+
+        try:
+            logging.info("正在获取最终的 RBM 权重...")
+            with torch.no_grad():
+                final_weights = model.bm.quadratic_coef.detach().cpu().numpy()
+            plot_rbm_weights(final_weights, log_save_dir, 'final')
+        except Exception as e:
+            logging.error(f"无法绘制 RBM 权重热力图: {e}")
+
+
+# --- 8. 将主逻辑放入 if __name__ == "__main__": ---
+if __name__ == "__main__":
+    main()

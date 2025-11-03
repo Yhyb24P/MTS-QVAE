@@ -25,9 +25,8 @@ def simple_fasta_reader(fasta_file):
         sys.exit(1)
 
 # --- 2. 定义输入和输出文件路径 ---
-INPUT_FASTA = 'data/vae/output/amts.fasta' 
-
-OUTPUT_NPZ = 'data/vae/output/amts.npz' 
+INPUT_FASTA = 'data/vae-v/output/generated_seqs_best_b2048_ld64_beta0.1_n5000.fasta' 
+OUTPUT_NPZ = 'data/vae-v/output/generated_seqs_best_b2048_ld64_beta0.1_n5000.npz' 
 
 # --- 3. 加载序列 ---
 print(f"正在从 {INPUT_FASTA} 加载序列...")

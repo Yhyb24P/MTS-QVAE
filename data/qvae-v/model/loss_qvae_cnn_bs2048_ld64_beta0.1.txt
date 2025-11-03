@@ -1,0 +1,252 @@
+使用双重梯度流 (VAE Loss + BM Loss) (无加权采样, β=0.1)
+VAE LR: 0.0001, BM LR: 1e-05, LATENT_DIM: 64
+Epoch: 0. Train VAE Loss: 272.4689 (ELBO: 272.4679, Cost: 276.8016, WD: 0.0010) | Train BM Loss: 0.6925
+Epoch: 0. Valid VAE Loss: 261.0205 (ELBO: 261.0195, Cost: 265.0414, WD: 0.0010) | Valid BM Loss: 0.5156
+Epoch: 0. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0005, Std=0.0097, Min=-0.0287, Max=0.0293
+BM h (一次项): Mean=0.0000, Std=0.0002, Min=-0.0002, Max=0.0003
+Epoch: 1. Train VAE Loss: 238.6917 (ELBO: 238.6908, Cost: 242.0595, WD: 0.0010) | Train BM Loss: 0.3625
+Epoch: 1. Valid VAE Loss: 211.2470 (ELBO: 211.2461, Cost: 214.1628, WD: 0.0010) | Valid BM Loss: 0.1341
+Epoch: 1. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0007, Std=0.0096, Min=-0.0284, Max=0.0295
+BM h (一次项): Mean=0.0003, Std=0.0002, Min=-0.0002, Max=0.0006
+Epoch: 2. Train VAE Loss: 186.4118 (ELBO: 186.4108, Cost: 189.8839, WD: 0.0010) | Train BM Loss: 0.2654
+Epoch: 2. Valid VAE Loss: 172.0452 (ELBO: 172.0442, Cost: 176.0474, WD: 0.0010) | Valid BM Loss: 0.5460
+Epoch: 2. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0010, Std=0.0096, Min=-0.0281, Max=0.0298
+BM h (一次项): Mean=0.0006, Std=0.0002, Min=0.0001, Max=0.0008
+Epoch: 3. Train VAE Loss: 162.0187 (ELBO: 162.0178, Cost: 166.2869, WD: 0.0010) | Train BM Loss: 0.4665
+Epoch: 3. Valid VAE Loss: 161.7650 (ELBO: 161.7641, Cost: 166.1964, WD: 0.0009) | Valid BM Loss: 0.4027
+Epoch: 3. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0010, Std=0.0096, Min=-0.0279, Max=0.0299
+BM h (一次项): Mean=0.0008, Std=0.0002, Min=0.0002, Max=0.0010
+Epoch: 4. Train VAE Loss: 155.6593 (ELBO: 155.6583, Cost: 160.0638, WD: 0.0009) | Train BM Loss: 0.4760
+Epoch: 4. Valid VAE Loss: 157.8638 (ELBO: 157.8628, Cost: 162.2035, WD: 0.0009) | Valid BM Loss: 0.4027
+Epoch: 4. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0009, Std=0.0095, Min=-0.0277, Max=0.0299
+BM h (一次项): Mean=0.0009, Std=0.0002, Min=0.0002, Max=0.0012
+Epoch: 5. Train VAE Loss: 152.4369 (ELBO: 152.4360, Cost: 156.5550, WD: 0.0009) | Train BM Loss: 0.4470
+Epoch: 5. Valid VAE Loss: 155.3247 (ELBO: 155.3238, Cost: 159.0957, WD: 0.0009) | Valid BM Loss: 0.4240
+Epoch: 5. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0009, Std=0.0095, Min=-0.0275, Max=0.0297
+BM h (一次项): Mean=0.0010, Std=0.0002, Min=0.0002, Max=0.0013
+Epoch: 6. Train VAE Loss: 150.6277 (ELBO: 150.6267, Cost: 154.1740, WD: 0.0009) | Train BM Loss: 0.4315
+Epoch: 6. Valid VAE Loss: 154.1969 (ELBO: 154.1959, Cost: 157.5296, WD: 0.0009) | Valid BM Loss: 0.5050
+Epoch: 6. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0009, Std=0.0095, Min=-0.0273, Max=0.0299
+BM h (一次项): Mean=0.0010, Std=0.0003, Min=-0.0001, Max=0.0016
+Epoch: 7. Train VAE Loss: 149.8268 (ELBO: 149.8259, Cost: 153.0539, WD: 0.0009) | Train BM Loss: 0.4480
+Epoch: 7. Valid VAE Loss: 153.7161 (ELBO: 153.7152, Cost: 156.8983, WD: 0.0009) | Valid BM Loss: 0.4395
+Epoch: 7. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0009, Std=0.0094, Min=-0.0270, Max=0.0300
+BM h (一次项): Mean=0.0011, Std=0.0004, Min=-0.0004, Max=0.0018
+Epoch: 8. Train VAE Loss: 149.3237 (ELBO: 149.3228, Cost: 152.4754, WD: 0.0009) | Train BM Loss: 0.3322
+Epoch: 8. Valid VAE Loss: 153.1156 (ELBO: 153.1147, Cost: 156.2571, WD: 0.0009) | Valid BM Loss: 0.3388
+Epoch: 8. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0010, Std=0.0094, Min=-0.0268, Max=0.0302
+BM h (一次项): Mean=0.0012, Std=0.0004, Min=-0.0004, Max=0.0020
+Epoch: 9. Train VAE Loss: 148.9654 (ELBO: 148.9645, Cost: 152.1088, WD: 0.0009) | Train BM Loss: 0.2632
+Epoch: 9. Valid VAE Loss: 153.0118 (ELBO: 153.0109, Cost: 156.1250, WD: 0.0009) | Valid BM Loss: 0.2312
+Epoch: 9. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0011, Std=0.0093, Min=-0.0265, Max=0.0304
+BM h (一次项): Mean=0.0013, Std=0.0005, Min=-0.0004, Max=0.0022
+Epoch: 10. Train VAE Loss: 148.6335 (ELBO: 148.6326, Cost: 151.7754, WD: 0.0009) | Train BM Loss: 0.1642
+Epoch: 10. Valid VAE Loss: 152.5994 (ELBO: 152.5985, Cost: 155.7904, WD: 0.0009) | Valid BM Loss: 0.2476
+Epoch: 10. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0012, Std=0.0093, Min=-0.0262, Max=0.0306
+BM h (一次项): Mean=0.0015, Std=0.0005, Min=-0.0004, Max=0.0024
+Epoch: 11. Train VAE Loss: 148.4211 (ELBO: 148.4202, Cost: 151.5692, WD: 0.0009) | Train BM Loss: 0.1836
+Epoch: 11. Valid VAE Loss: 152.3075 (ELBO: 152.3066, Cost: 155.4007, WD: 0.0009) | Valid BM Loss: 0.0172
+Epoch: 11. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0013, Std=0.0093, Min=-0.0259, Max=0.0307
+BM h (一次项): Mean=0.0017, Std=0.0005, Min=-0.0003, Max=0.0026
+Epoch: 12. Train VAE Loss: 148.2127 (ELBO: 148.2118, Cost: 151.3426, WD: 0.0009) | Train BM Loss: 0.1418
+Epoch: 12. Valid VAE Loss: 152.1167 (ELBO: 152.1158, Cost: 155.2508, WD: 0.0009) | Valid BM Loss: 0.3199
+Epoch: 12. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0014, Std=0.0093, Min=-0.0257, Max=0.0307
+BM h (一次项): Mean=0.0019, Std=0.0005, Min=-0.0001, Max=0.0027
+Epoch: 13. Train VAE Loss: 148.0115 (ELBO: 148.0106, Cost: 151.1356, WD: 0.0009) | Train BM Loss: 0.1662
+Epoch: 13. Valid VAE Loss: 151.9076 (ELBO: 151.9067, Cost: 154.9972, WD: 0.0009) | Valid BM Loss: 0.1956
+Epoch: 13. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0014, Std=0.0093, Min=-0.0256, Max=0.0306
+BM h (一次项): Mean=0.0021, Std=0.0005, Min=-0.0000, Max=0.0028
+Epoch: 14. Train VAE Loss: 147.8269 (ELBO: 147.8260, Cost: 150.9322, WD: 0.0009) | Train BM Loss: 0.1060
+Epoch: 14. Valid VAE Loss: 151.6346 (ELBO: 151.6337, Cost: 154.7025, WD: 0.0009) | Valid BM Loss: 0.2209
+Epoch: 14. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0014, Std=0.0093, Min=-0.0256, Max=0.0306
+BM h (一次项): Mean=0.0023, Std=0.0005, Min=0.0000, Max=0.0029
+Epoch: 15. Train VAE Loss: 147.5911 (ELBO: 147.5902, Cost: 150.6768, WD: 0.0009) | Train BM Loss: 0.1605
+Epoch: 15. Valid VAE Loss: 151.4417 (ELBO: 151.4408, Cost: 154.4689, WD: 0.0009) | Valid BM Loss: 0.1776
+Epoch: 15. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0014, Std=0.0093, Min=-0.0256, Max=0.0305
+BM h (一次项): Mean=0.0025, Std=0.0006, Min=0.0000, Max=0.0032
+Epoch: 16. Train VAE Loss: 147.2856 (ELBO: 147.2847, Cost: 150.3289, WD: 0.0009) | Train BM Loss: 0.1354
+Epoch: 16. Valid VAE Loss: 151.0858 (ELBO: 151.0849, Cost: 154.0968, WD: 0.0009) | Valid BM Loss: 0.0512
+Epoch: 16. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0014, Std=0.0092, Min=-0.0256, Max=0.0304
+BM h (一次项): Mean=0.0026, Std=0.0006, Min=0.0001, Max=0.0034
+Epoch: 17. Train VAE Loss: 146.8795 (ELBO: 146.8786, Cost: 149.8564, WD: 0.0009) | Train BM Loss: 0.0876
+Epoch: 17. Valid VAE Loss: 150.6734 (ELBO: 150.6725, Cost: 153.5953, WD: 0.0009) | Valid BM Loss: 0.0583
+Epoch: 17. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0015, Std=0.0092, Min=-0.0255, Max=0.0301
+BM h (一次项): Mean=0.0028, Std=0.0006, Min=0.0002, Max=0.0036
+Epoch: 18. Train VAE Loss: 146.3267 (ELBO: 146.3258, Cost: 149.2177, WD: 0.0009) | Train BM Loss: 0.0592
+Epoch: 18. Valid VAE Loss: 150.0485 (ELBO: 150.0476, Cost: 152.8666, WD: 0.0009) | Valid BM Loss: 0.0794
+Epoch: 18. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0015, Std=0.0092, Min=-0.0253, Max=0.0298
+BM h (一次项): Mean=0.0030, Std=0.0007, Min=0.0002, Max=0.0039
+Epoch: 19. Train VAE Loss: 145.6935 (ELBO: 145.6926, Cost: 148.4983, WD: 0.0009) | Train BM Loss: 0.1217
+Epoch: 19. Valid VAE Loss: 149.0670 (ELBO: 149.0661, Cost: 151.8750, WD: 0.0009) | Valid BM Loss: 0.2569
+Epoch: 19. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0015, Std=0.0092, Min=-0.0252, Max=0.0295
+BM h (一次项): Mean=0.0032, Std=0.0007, Min=0.0001, Max=0.0041
+Epoch: 20. Train VAE Loss: 144.9594 (ELBO: 144.9585, Cost: 147.6880, WD: 0.0009) | Train BM Loss: 0.0707
+Epoch: 20. Valid VAE Loss: 148.6211 (ELBO: 148.6202, Cost: 151.3244, WD: 0.0009) | Valid BM Loss: 0.0994
+Epoch: 20. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0015, Std=0.0092, Min=-0.0251, Max=0.0292
+BM h (一次项): Mean=0.0034, Std=0.0008, Min=0.0000, Max=0.0043
+Epoch: 21. Train VAE Loss: 144.2594 (ELBO: 144.2585, Cost: 146.9176, WD: 0.0009) | Train BM Loss: 0.0339
+Epoch: 21. Valid VAE Loss: 147.7270 (ELBO: 147.7261, Cost: 150.2316, WD: 0.0009) | Valid BM Loss: 0.1424
+Epoch: 21. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0016, Std=0.0092, Min=-0.0251, Max=0.0290
+BM h (一次项): Mean=0.0036, Std=0.0009, Min=-0.0000, Max=0.0046
+Epoch: 22. Train VAE Loss: 143.6216 (ELBO: 143.6207, Cost: 146.1952, WD: 0.0009) | Train BM Loss: 0.1821
+Epoch: 22. Valid VAE Loss: 147.0886 (ELBO: 147.0877, Cost: 149.6465, WD: 0.0009) | Valid BM Loss: 0.1664
+Epoch: 22. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0015, Std=0.0092, Min=-0.0252, Max=0.0289
+BM h (一次项): Mean=0.0037, Std=0.0009, Min=-0.0000, Max=0.0047
+Epoch: 23. Train VAE Loss: 142.9231 (ELBO: 142.9222, Cost: 145.4392, WD: 0.0009) | Train BM Loss: 0.0980
+Epoch: 23. Valid VAE Loss: 146.6707 (ELBO: 146.6698, Cost: 149.1475, WD: 0.0009) | Valid BM Loss: -0.1036
+Epoch: 23. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0015, Std=0.0092, Min=-0.0255, Max=0.0287
+BM h (一次项): Mean=0.0039, Std=0.0009, Min=0.0000, Max=0.0049
+Epoch: 24. Train VAE Loss: 142.3737 (ELBO: 142.3728, Cost: 144.8679, WD: 0.0009) | Train BM Loss: 0.0970
+Epoch: 24. Valid VAE Loss: 145.8968 (ELBO: 145.8959, Cost: 148.3890, WD: 0.0009) | Valid BM Loss: 0.1161
+Epoch: 24. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0015, Std=0.0092, Min=-0.0257, Max=0.0287
+BM h (一次项): Mean=0.0040, Std=0.0010, Min=-0.0000, Max=0.0051
+Epoch: 25. Train VAE Loss: 141.9897 (ELBO: 141.9888, Cost: 144.4470, WD: 0.0009) | Train BM Loss: 0.0794
+Epoch: 25. Valid VAE Loss: 145.4274 (ELBO: 145.4265, Cost: 147.9230, WD: 0.0009) | Valid BM Loss: 0.1064
+Epoch: 25. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0015, Std=0.0092, Min=-0.0259, Max=0.0287
+BM h (一次项): Mean=0.0042, Std=0.0011, Min=-0.0000, Max=0.0053
+Epoch: 26. Train VAE Loss: 141.5114 (ELBO: 141.5105, Cost: 143.9716, WD: 0.0009) | Train BM Loss: 0.0496
+Epoch: 26. Valid VAE Loss: 145.1623 (ELBO: 145.1614, Cost: 147.6164, WD: 0.0009) | Valid BM Loss: 0.0877
+Epoch: 26. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0015, Std=0.0092, Min=-0.0261, Max=0.0288
+BM h (一次项): Mean=0.0044, Std=0.0011, Min=-0.0001, Max=0.0056
+Epoch: 27. Train VAE Loss: 141.1661 (ELBO: 141.1652, Cost: 143.5951, WD: 0.0009) | Train BM Loss: -0.0469
+Epoch: 27. Valid VAE Loss: 144.7483 (ELBO: 144.7474, Cost: 147.1905, WD: 0.0009) | Valid BM Loss: 0.0198
+Epoch: 27. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0016, Std=0.0092, Min=-0.0263, Max=0.0289
+BM h (一次项): Mean=0.0046, Std=0.0012, Min=-0.0002, Max=0.0059
+Epoch: 28. Train VAE Loss: 140.9536 (ELBO: 140.9527, Cost: 143.3708, WD: 0.0009) | Train BM Loss: -0.0971
+Epoch: 28. Valid VAE Loss: 144.2611 (ELBO: 144.2601, Cost: 146.7140, WD: 0.0009) | Valid BM Loss: 0.0417
+Epoch: 28. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0017, Std=0.0092, Min=-0.0265, Max=0.0290
+BM h (一次项): Mean=0.0049, Std=0.0013, Min=-0.0003, Max=0.0062
+Epoch: 29. Train VAE Loss: 140.6200 (ELBO: 140.6191, Cost: 143.0484, WD: 0.0009) | Train BM Loss: -0.0194
+Epoch: 29. Valid VAE Loss: 144.5780 (ELBO: 144.5771, Cost: 147.0587, WD: 0.0009) | Valid BM Loss: 0.0219
+Epoch: 29. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0018, Std=0.0092, Min=-0.0267, Max=0.0290
+BM h (一次项): Mean=0.0051, Std=0.0014, Min=-0.0004, Max=0.0065
+Epoch: 30. Train VAE Loss: 140.4614 (ELBO: 140.4604, Cost: 142.8618, WD: 0.0009) | Train BM Loss: -0.0442
+Epoch: 30. Valid VAE Loss: 144.0015 (ELBO: 144.0006, Cost: 146.4206, WD: 0.0009) | Valid BM Loss: -0.0668
+Epoch: 30. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0018, Std=0.0092, Min=-0.0268, Max=0.0290
+BM h (一次项): Mean=0.0053, Std=0.0015, Min=-0.0004, Max=0.0067
+Epoch: 31. Train VAE Loss: 140.1564 (ELBO: 140.1555, Cost: 142.5616, WD: 0.0009) | Train BM Loss: -0.1638
+Epoch: 31. Valid VAE Loss: 144.1254 (ELBO: 144.1245, Cost: 146.4799, WD: 0.0009) | Valid BM Loss: 0.0998
+Epoch: 31. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0020, Std=0.0093, Min=-0.0269, Max=0.0292
+BM h (一次项): Mean=0.0056, Std=0.0017, Min=-0.0003, Max=0.0071
+Epoch: 32. Train VAE Loss: 140.0716 (ELBO: 140.0707, Cost: 142.4692, WD: 0.0009) | Train BM Loss: 0.0018
+Epoch: 32. Valid VAE Loss: 143.5076 (ELBO: 143.5066, Cost: 145.8605, WD: 0.0009) | Valid BM Loss: 0.1569
+Epoch: 32. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0021, Std=0.0093, Min=-0.0270, Max=0.0292
+BM h (一次项): Mean=0.0058, Std=0.0017, Min=-0.0003, Max=0.0073
+Epoch: 33. Train VAE Loss: 139.7892 (ELBO: 139.7883, Cost: 142.1840, WD: 0.0009) | Train BM Loss: 0.0766
+Epoch: 33. Valid VAE Loss: 143.5565 (ELBO: 143.5555, Cost: 145.9770, WD: 0.0009) | Valid BM Loss: 0.1308
+Epoch: 33. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0021, Std=0.0093, Min=-0.0271, Max=0.0292
+BM h (一次项): Mean=0.0059, Std=0.0018, Min=-0.0003, Max=0.0075
+Epoch: 34. Train VAE Loss: 139.6961 (ELBO: 139.6951, Cost: 142.0877, WD: 0.0009) | Train BM Loss: 0.0663
+Epoch: 34. Valid VAE Loss: 143.6562 (ELBO: 143.6552, Cost: 146.0470, WD: 0.0009) | Valid BM Loss: 0.2063
+Epoch: 34. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0021, Std=0.0093, Min=-0.0272, Max=0.0292
+BM h (一次项): Mean=0.0061, Std=0.0019, Min=-0.0003, Max=0.0077
+Epoch: 35. Train VAE Loss: 139.6235 (ELBO: 139.6225, Cost: 142.0034, WD: 0.0009) | Train BM Loss: 0.1261
+Epoch: 35. Valid VAE Loss: 143.2161 (ELBO: 143.2151, Cost: 145.6092, WD: 0.0009) | Valid BM Loss: 0.0545
+Epoch: 35. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0020, Std=0.0093, Min=-0.0273, Max=0.0291
+BM h (一次项): Mean=0.0062, Std=0.0019, Min=-0.0002, Max=0.0079
+Epoch: 36. Train VAE Loss: 139.5104 (ELBO: 139.5095, Cost: 141.8828, WD: 0.0009) | Train BM Loss: 0.0551
+Epoch: 36. Valid VAE Loss: 143.0889 (ELBO: 143.0880, Cost: 145.4921, WD: 0.0009) | Valid BM Loss: 0.2118
+Epoch: 36. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0021, Std=0.0093, Min=-0.0273, Max=0.0293
+BM h (一次项): Mean=0.0064, Std=0.0020, Min=-0.0002, Max=0.0081
+Epoch: 37. Train VAE Loss: 139.4044 (ELBO: 139.4035, Cost: 141.7853, WD: 0.0009) | Train BM Loss: 0.0010
+Epoch: 37. Valid VAE Loss: 142.9786 (ELBO: 142.9776, Cost: 145.3441, WD: 0.0009) | Valid BM Loss: 0.1950
+Epoch: 37. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0021, Std=0.0093, Min=-0.0274, Max=0.0293
+BM h (一次项): Mean=0.0066, Std=0.0020, Min=-0.0001, Max=0.0083
+Epoch: 38. Train VAE Loss: 139.2964 (ELBO: 139.2954, Cost: 141.6620, WD: 0.0009) | Train BM Loss: -0.0172
+Epoch: 38. Valid VAE Loss: 142.9117 (ELBO: 142.9107, Cost: 145.3053, WD: 0.0010) | Valid BM Loss: 0.0053
+Epoch: 38. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0021, Std=0.0093, Min=-0.0274, Max=0.0293
+BM h (一次项): Mean=0.0068, Std=0.0021, Min=-0.0002, Max=0.0085
+Epoch: 39. Train VAE Loss: 139.2634 (ELBO: 139.2625, Cost: 141.6407, WD: 0.0010) | Train BM Loss: -0.1821
+Epoch: 39. Valid VAE Loss: 143.1483 (ELBO: 143.1473, Cost: 145.5316, WD: 0.0010) | Valid BM Loss: -0.0742
+Epoch: 39. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0023, Std=0.0093, Min=-0.0274, Max=0.0295
+BM h (一次项): Mean=0.0070, Std=0.0023, Min=-0.0003, Max=0.0089
+Epoch: 40. Train VAE Loss: 139.1316 (ELBO: 139.1306, Cost: 141.5132, WD: 0.0010) | Train BM Loss: -0.1691
+Epoch: 40. Valid VAE Loss: 142.6285 (ELBO: 142.6275, Cost: 145.0039, WD: 0.0010) | Valid BM Loss: -0.1276
+Epoch: 40. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0024, Std=0.0094, Min=-0.0274, Max=0.0296
+BM h (一次项): Mean=0.0073, Std=0.0024, Min=-0.0004, Max=0.0092
+Epoch: 41. Train VAE Loss: 139.0101 (ELBO: 139.0091, Cost: 141.3829, WD: 0.0010) | Train BM Loss: -0.0172
+Epoch: 41. Valid VAE Loss: 143.0158 (ELBO: 143.0148, Cost: 145.4156, WD: 0.0010) | Valid BM Loss: 0.0041
+Epoch: 41. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0025, Std=0.0094, Min=-0.0275, Max=0.0296
+BM h (一次项): Mean=0.0075, Std=0.0025, Min=-0.0004, Max=0.0095
+Epoch: 42. Train VAE Loss: 139.0400 (ELBO: 139.0391, Cost: 141.4154, WD: 0.0010) | Train BM Loss: -0.0578
+Epoch: 42. Valid VAE Loss: 142.7922 (ELBO: 142.7912, Cost: 145.1836, WD: 0.0010) | Valid BM Loss: 0.0028
+Epoch: 42. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0026, Std=0.0094, Min=-0.0275, Max=0.0296
+BM h (一次项): Mean=0.0077, Std=0.0026, Min=-0.0005, Max=0.0097
+Epoch: 43. Train VAE Loss: 138.9696 (ELBO: 138.9686, Cost: 141.3403, WD: 0.0010) | Train BM Loss: -0.2479
+Epoch: 43. Valid VAE Loss: 142.7758 (ELBO: 142.7748, Cost: 145.1441, WD: 0.0010) | Valid BM Loss: -0.0782
+Epoch: 43. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0027, Std=0.0094, Min=-0.0274, Max=0.0297
+BM h (一次项): Mean=0.0080, Std=0.0027, Min=-0.0006, Max=0.0100
+Epoch: 44. Train VAE Loss: 138.8896 (ELBO: 138.8886, Cost: 141.2676, WD: 0.0010) | Train BM Loss: -0.2681
+Epoch: 44. Valid VAE Loss: 142.4809 (ELBO: 142.4799, Cost: 144.8934, WD: 0.0010) | Valid BM Loss: -0.0450
+Epoch: 44. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0029, Std=0.0095, Min=-0.0274, Max=0.0301
+BM h (一次项): Mean=0.0082, Std=0.0028, Min=-0.0007, Max=0.0104
+Epoch: 45. Train VAE Loss: 138.7130 (ELBO: 138.7120, Cost: 141.0913, WD: 0.0010) | Train BM Loss: 0.0840
+Epoch: 45. Valid VAE Loss: 142.5114 (ELBO: 142.5103, Cost: 144.9258, WD: 0.0010) | Valid BM Loss: 0.2522
+Epoch: 45. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0029, Std=0.0095, Min=-0.0275, Max=0.0302
+BM h (一次项): Mean=0.0084, Std=0.0029, Min=-0.0007, Max=0.0106
+Epoch: 46. Train VAE Loss: 138.7398 (ELBO: 138.7388, Cost: 141.1257, WD: 0.0010) | Train BM Loss: 0.0812
+Epoch: 46. Valid VAE Loss: 142.4240 (ELBO: 142.4230, Cost: 144.8410, WD: 0.0010) | Valid BM Loss: 0.1962
+Epoch: 46. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0029, Std=0.0095, Min=-0.0275, Max=0.0304
+BM h (一次项): Mean=0.0086, Std=0.0029, Min=-0.0007, Max=0.0108
+Epoch: 47. Train VAE Loss: 138.6970 (ELBO: 138.6960, Cost: 141.0758, WD: 0.0010) | Train BM Loss: 0.0655
+Epoch: 47. Valid VAE Loss: 142.4063 (ELBO: 142.4053, Cost: 144.7799, WD: 0.0010) | Valid BM Loss: 0.0221
+Epoch: 47. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0030, Std=0.0095, Min=-0.0275, Max=0.0305
+BM h (一次项): Mean=0.0088, Std=0.0030, Min=-0.0007, Max=0.0110
+Epoch: 48. Train VAE Loss: 138.7512 (ELBO: 138.7501, Cost: 141.1215, WD: 0.0010) | Train BM Loss: 0.0319
+Epoch: 48. Valid VAE Loss: 142.2873 (ELBO: 142.2863, Cost: 144.6887, WD: 0.0010) | Valid BM Loss: 0.1563
+Epoch: 48. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0030, Std=0.0095, Min=-0.0275, Max=0.0306
+BM h (一次项): Mean=0.0089, Std=0.0031, Min=-0.0007, Max=0.0112
+Epoch: 49. Train VAE Loss: 138.7170 (ELBO: 138.7159, Cost: 141.0787, WD: 0.0010) | Train BM Loss: 0.0403
+Epoch: 49. Valid VAE Loss: 142.4649 (ELBO: 142.4638, Cost: 144.8772, WD: 0.0011) | Valid BM Loss: 0.2636
+Epoch: 49. 当前学习率 (VAE): 0.0001, (BM): 1e-05
+BM W (二次项): Mean=0.0030, Std=0.0095, Min=-0.0275, Max=0.0307
+BM h (一次项): Mean=0.0091, Std=0.0032, Min=-0.0007, Max=0.0115
